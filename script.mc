@@ -4,5 +4,5 @@ mostrar em tela: "Vai Irã!"
 mostrar na tela "Vai Irã!"
 variáv recebe "Monarca"
 variável idade 2 vezes 8 menos a
-mostrar na tela: "Eu sou uma linguagem de programação de alto nível, nomeada \nome !"
-mostrar na tela: "Eu tenho apenas \idade semanas de idade"
+mostrar na tela: "Eu sou uma linguagem de programação de alto nível, nomeada " nome "!"
+mostrar na tela: "Eu tenho apenas " idade " semanas de idade"
