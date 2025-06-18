@@ -23,7 +23,7 @@ class Monarca:
             'dividindo': '/'
         }
 
-    # Função de erro. Basta passar a mensagem de erro como argumento, que ele vai reconhecer a linha do erro sozinho.
+    # Função de erro. Basta passar a mensagem de erro como argumento que ele vai reconhecer a linha do erro sozinho.
     def erro(self, mensagem='', dica=''):
         print('\033[1;33m='*10, 'Monarca', '='*10)
         print(f'\033[1;31m * Erro na linha {self.linha + 1}. \033[0m' + mensagem)
@@ -32,30 +32,33 @@ class Monarca:
 
     def processar_variavel(self, dado):
         try:
-            expressao = [] # Uma lista para ir depositando os elementos do dado durante o processamento.
-            # Por exemplo, um dado "5 mais 5" eventualmente iria ficar {'5', 'mais', '5'}, separando os tipos de dado, as variáveis e as operações.
-            trecho = '' # Variável para se ler apenas trechos do dado inteiro
-
-            # Primeira parte da função.
-            # A cada loop, um trecho é lido, interpretado e armazenado na lista.
-            while dado != '': # Cada trecho lido e armazenado é em seguida apagado da string dado. Ou seja, o loop roda enquanto ainda há trecho a ser lido.
-                if dado[0] == "\"": # Checa se a expressão começa com aspa, ou seja, se há uma string logo no início. Se sim, checa se há outra aspa e caso haja armazena o trecho interior como string e o apaga da variável string dado.
+            expressao = []
+            trecho = ''
+            ### Primeira etapa da função
+            # Nessa etapa, o Monarca quebra o dado recebido em diferentes partes e as armazena na lista "expressao".
+            # A ideia é identificar o que é string, o que é número, o que é variável, etc.
+            # Por exemplo, um dado "5 mais 5" eventualmente iria ficar {'5', 'mais', '5'}. Seriam dois valores numéricos e o operador "mais".
+            # Outro exemplo: Um dado ""Meu nome é " nome", supondo que "nome" seja uma variável de valor "Carlos", ficaria armazenado como {'"Meu nome é "', 'Carlos'}.
+            # A cada loop, um trecho é lido, interpretado e armazenado na lista "expressao".
+            # O trecho lido também é apagado da variável "dado", então o loop abaixo roda enquanto houver informação na variável.
+            while dado != '':
+                if dado[0] == "\"": # Checa se a expressão começa com aspa, ou seja, se há uma string logo no início. Se sim, checa se há outra aspa e caso haja armazena o trecho e o apaga da variável dado.
                     c = dado.find("\"", 1) # Índice da próxima aspa
-                    if c != -1: # Ou seja, se existe outra aspa para completar o par.
+                    if c != -1: # Ou seja, se existe outra aspa para completar o par, já que seria -1 se não encontrasse.
                         expressao.append(dado[0:c+1]) 
                         dado = dado[c+1:] 
                         continue
                     else:   # Se não existe par, aponta erro
                         raise Exception                 
-                else: # Em caso de não começar com aspa. Ou seja, poderia ser um número, uma variável etc.
+                else: # Em caso de não começar com aspa. Ou seja, poderia ser um número, uma variável, um operador etc.
                     if "\"" in dado:                # Esse if...else checa se em dado momento aparecerá uma string. Se não aparecer, o código só lê tudo. Se aparecer, lê até o momento da string.
                         c = dado.find("\"")
-                        trecho = dado[0:c].split()                        
+                        trecho = dado[0:c]                        
                         dado = dado[c:]
                     else:                    
-                        trecho = dado[0:].split()
+                        trecho = dado[0:]
                         dado = ''
-                    for palavra in trecho: # Leitura do trecho. Checa e substitui as variáveis, checa a validade dos números, etc
+                    for palavra in trecho.split(): # Leitura do trecho. Checa e substitui as variáveis, checa a validade dos números, etc
                         if palavra.replace('\\', '') in self.variaveis.keys():
                             palavra = self.variaveis[palavra]
                         elif all(i in {"0","1","2","3","4","5","6","7","8","9",","} for i in palavra) and palavra.count(",") <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                    
@@ -63,7 +66,7 @@ class Monarca:
                         elif not palavra in self.operações: # Se não for variável nem número, e também não for nenhuma operação, dá erro.
                             self.erro(f'Não é possível resolver "{' '.join(trecho)}".')
                         expressao.append(palavra) 
-            # Ao final desse loop while, uma expressão "Oi, meu nome é " nome " e eu tenho " 23,5 mais 5,5 " anos", supondo que nome seja uma variável de valor "Carlos",
+            # Ao encerramento desse loop while, uma expressão "Oi, meu nome é " nome " e eu tenho " 23,5 mais 5,5 " anos", supondo que nome seja uma variável de valor "Carlos",
             # ficaria uma lista ['"Oi, meu nome é "', '"Carlos"', '" e eu tenho "', '23.5', 'mais', '5.5', '" anos"']
 
         except Exception:
@@ -139,13 +142,12 @@ class Monarca:
 
     # Função análoga ao print
     def escrever(self, texto):
-        texto = texto.split(' ')
-        for c in range(0, len(texto)):
-            palavra = texto[c]
-            if palavra[0] == '\\' and palavra[1:] in self.variaveis.keys():
-                texto[c] = str(self.variaveis[palavra[1:]])
-        texto = ' '.join(texto).replace('\\\\', '\\').replace('\n', '').replace('"', '')
-        print(texto)    
+        if texto.strip() != '':
+            texto = self.processar_variavel(texto)
+            texto = texto[1:len(texto)-1] if texto[0] == "\"" else texto # O Monarca guarda valores de strings com aspas. Para imprimir, removem-se estas aspas.
+            print(texto)
+        else:
+            self.erro("Nenhum valor indicado para impressão na tela.")    
 
     # Função para inicializar ou deletar variáveis
     def variavel(self, operacao='', nome='', var=None):

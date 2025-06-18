@@ -7,3 +7,9 @@
 * Implementar definição de funções
 * Implementar funções built-in (len, replace etc)
 * Adicionar análise de distância de significados dos comandos
+* Permitir que o usuário utilize aspas dentro de suas strings.
+* Buscar uma solução para vincular as palavras-chaves automaticamente com os comandos que estamos escrevendo, ao invés de fazer isso manualmente.
+
+Lista de Bugs:
+Espaços como em "Vai   Irã" quebram o código.
+Números que poderiam ser inteiros são retornados como float.
