@@ -28,7 +28,7 @@ for c, linha in enumerate(script):
         índice = linha.find('::info')
         linha = linha[:índice]
 
-    dlinha = linha.split() # Lista que contém a linha dividida em palavras.    
+    dlinha = linha.split(' ') # Lista que contém a linha dividida em palavras.    
     if linha.strip() == '': # Checa se é uma linha vazia. Se sim, apenas pula para a próxima.
         continue                                                      
     # Informa o index da linha para o Monarca, a fim de apontar onde ocorreu algum eventual erro.  
