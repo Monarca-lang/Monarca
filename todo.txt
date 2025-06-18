@@ -11,5 +11,4 @@
 * Buscar uma solução para vincular as palavras-chaves automaticamente com os comandos que estamos escrevendo, ao invés de fazer isso manualmente.
 
 Lista de Bugs:
-Espaços como em "Vai   Irã" quebram o código.
 Números que poderiam ser inteiros são retornados como float.
