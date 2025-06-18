@@ -72,8 +72,13 @@ for c, linha in enumerate(script):
             else:
                 valor = ' '.join(dlinha[3:])
                 valor = monarca.processar_variavel(dado=valor) # Envia tudo o que vier depois de "recebe" para ser processado pela função.    
-                monarca.escrever(texto=linha[17:])     
-            
+                monarca.escrever(texto=linha[17:])
+
+        # WIP Verifica se o usuário quer abrir um bloco condicional
+        elif dlinha[0] == 'se':
+            condições = [x for x in dlinha[3:-1]]
+            if monarca.condicional_se(condições):
+                pass
     # Entrega um erro e uma sugestão de correção caso o comando não esteja previsto na documentação. 
     else:
         distancias = [distance(dlinha[0], palavra) for palavra in monarca.palavras_reservadas]

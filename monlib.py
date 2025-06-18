@@ -6,7 +6,8 @@ class Monarca:
             'mostrar',
             'variável',
             'clonar',
-            'deletar'
+            'deletar',
+            'se'
         )
         self.operações = (
             'mais',
@@ -14,6 +15,13 @@ class Monarca:
             'vezes',
             'dividindo'
         )
+        #eu juro que eu vou incorporar isso de maneira mais clean no resto do código depois
+        self.opcondicionais = {
+            'mais': '+',
+            'menos': '-',
+            'vezes': '*',
+            'dividindo': '/'
+        }
 
     # Função de erro. Basta passar a mensagem de erro como argumento, que ele vai reconhecer a linha do erro sozinho.
     def erro(self, mensagem='', dica=''):
@@ -204,3 +212,25 @@ class Monarca:
         if var1 in self.variaveis.keys() and var2 in self.variaveis.keys():
             self.variaveis[var2] = self.variaveis[var1]
             self.vartipos[var2] = self.vartipos[var1]
+
+    # funções condicionais, extremamente WIP
+    # só retorna se o resultado da condição é verdadeira ou não e só funciona com equações de valores numéricos declarados na hora,
+    # mas eventualmente vai ficar fully fledged
+    def condicional_se(self, condições):
+        # pega as condições "brutas" e trata elas
+        condições = [x.strip('",') for x in condições]
+        # faz o resto dos b.o
+        expressão = []
+        indice = 0
+        while indice != len(condições):
+            elemento = condições[indice]
+            if elemento.isnumeric():
+                expressão.append(elemento)
+            else:
+                if elemento in self.opcondicionais:
+                    expressão.append(self.opcondicionais[elemento])
+                elif elemento == "igual":
+                    expressão.append("==")
+                    indice += 1
+            indice += 1
+        return eval(''.join(expressão))
