@@ -1,2 +1,1 @@
-# Monarca
-The Monarca programming language repository.
+# Monarca: Uma Linguagem de Programação Acessível

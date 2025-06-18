@@ -1,0 +1,9 @@
+* Reportar bugs
+* CORRIGIR BUGS!
+* Implementar operações lógicas (booleanas)
+* Implementar conversão de tipos
+* Implementar desvios condicionais
+* Implementar laços de repetição
+* Implementar definição de funções
+* Implementar funções built-in (len, replace etc)
+* Adicionar análise de distância de significados dos comandos
