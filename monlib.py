@@ -13,7 +13,8 @@ class Monarca:
             'mais',
             'menos',
             'vezes',
-            'dividindo'
+            'dividindo',
+            'igual'
         )
         #eu juro que eu vou incorporar isso de maneira mais clean no resto do código depois
         self.opcondicionais = {
@@ -22,6 +23,10 @@ class Monarca:
             'vezes': '*',
             'dividindo': '/'
         }
+        self.booleanos = (
+            'verdadeiro',
+            'falso'
+        )
 
     # Função de erro. Basta passar a mensagem de erro como argumento que ele vai reconhecer a linha do erro sozinho.
     def erro(self, mensagem='', dica=''):
@@ -58,12 +63,13 @@ class Monarca:
                             palavra = self.variaveis[palavra]
                         elif palavra.replace(',','').isnumeric() and palavra.count(",") <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                 
                             palavra = palavra.replace(",",".")  # Converte vírgula para ponto para poder ser lido nas operações.
-                        elif not palavra in self.operações: # Se não for variável nem número, e também não for nenhuma operação, dá erro.
+                        elif not palavra in self.operações and not palavra in self.booleanos: # Se não for variável, nem número, nem booleano e nem operação, dá erro.
+                            print("erro", palavra)
                             self.erro(f'Não é possível resolver "{''.join(trecho)}".')
                         elementos.append(palavra)
         return elementos
     
-    def operacoes(self, elementos):
+    def calcular(self, elementos):
         i = 0
         try:      
             while 'vezes' in elementos or 'dividindo' in elementos:                                      
@@ -95,9 +101,21 @@ class Monarca:
                     elementos.pop(i - 1)                                        
                 else:
                     i += 1
+            i = 0
+            while 'igual' in elementos:
+                if elementos[i] == 'igual':
+                    num1 = elementos[i - 1]
+                    num2 = elementos[i + 1]
+                    resultado = 'verdadeiro' if num1 == num2 else 'falso'
+                    elementos[i+1] = str(resultado)                 
+                    elementos.pop(i - 1)                    
+                    elementos.pop(i - 1)
+                else:
+                    i += 1                 
             return elementos
-        except Exception:
-            self.erro(f'Não é possível resolver "{''.join(elementos)}".')
+        except Exception as i:
+            print(i)
+            self.erro(f'Não é possível resolver "{' '.join(elementos)}".')
 
     def processar_expressao(self, expressao):
         # A função identificar_elementos divide a expressão em uma lista cujos elementos são separados levando em contas strings, números, operações, variáveis etc.
@@ -106,7 +124,7 @@ class Monarca:
         # Ex: A expressão ""Meu nome é " nome", supondo que "nome" seja uma variável de valor "Carlos", ficaria armazenada como {'"Meu nome é "', 'Carlos'}.
         elementos = self.identificar_elementos(expressao=expressao)
         # Identifica os operadores e aplica os cálculos.
-        elementos = self.operacoes(elementos=elementos)
+        elementos = self.calcular(elementos=elementos)
             
         # Terceira etapa: tipagem e finalização. Nesse ponto, se a expressão não retornar uma lista com um único elemento, será tratada como uma string. 
         # Também será tratada como string se tiver um único elemento envolto em aspas.

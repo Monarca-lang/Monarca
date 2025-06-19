@@ -6,3 +6,5 @@ variáv recebe "Monarca"
 variável idade 2 vezes 8 menos a
 mostrar na tela: "Eu sou uma linguagem de programação de alto nível, nomeada " nome "!"
 mostrar na tela: "Eu tenho apenas " idade " semanas de idade"
+mostrar na tela: "oi" igual "oi"
+mostrar na tela: "oi" igual "olá"

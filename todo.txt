@@ -10,6 +10,7 @@
 * Permitir que o usuário utilize aspas dentro de suas strings.
 * Buscar uma solução para vincular as palavras-chaves automaticamente com os comandos que estamos escrevendo, ao invés de fazer isso manualmente.
 * Adicionar a possibilidade de utilizar símbolos matemáticos.
+* Simplificar a função de operações, pois há muito código repetido.
 * (Para Ray) Modificar a parte do código que inverte vírgulas por pontos etc.
 
 # Lista de Bugs:
