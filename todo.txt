@@ -9,6 +9,9 @@
 * Adicionar análise de distância de significados dos comandos
 * Permitir que o usuário utilize aspas dentro de suas strings.
 * Buscar uma solução para vincular as palavras-chaves automaticamente com os comandos que estamos escrevendo, ao invés de fazer isso manualmente.
+* Adicionar a possibilidade de utilizar símbolos matemáticos.
+* (Para Ray) Modificar a parte do código que inverte vírgulas por pontos etc.
 
-Lista de Bugs:
-Números que poderiam ser inteiros são retornados como float.
+# Lista de Bugs:
+* Números que poderiam ser inteiros são retornados como float.
+* Imprecisão no cálculo. 25 vezes 8,2 retorna 204,99999999999997 ao invés de 205. Tem a ver com o bug anterior.

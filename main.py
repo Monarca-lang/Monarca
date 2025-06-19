@@ -51,7 +51,7 @@ for c, linha in enumerate(script):
             else:
                 # Envia tudo o que vier depois de "recebe" para ser processado.
                 valor = ' '.join(dlinha[3:])
-                valor = monarca.processar_variavel(dado=valor)
+                valor = monarca.processar_expressao(expressao=valor)
                 monarca.variavel(operacao='add', nome=dlinha[1], var=valor)
                 
         # Verifica se o usuário quer deletar uma variável
@@ -76,8 +76,8 @@ for c, linha in enumerate(script):
                 dica = f'mostrar na \033[1;32mtela:\033[0m {' '.join(dlinha[3:]) if len(dlinha)>3 else "[valor de sua escolha]"} '
                 monarca.erro(f'A palavra "tela:" deve ser explicitada no comando "mostrar na tela".', dica)
             else:
-                valor = ' '.join(dlinha[3:])
-                valor = monarca.processar_variavel(dado=valor) # Envia tudo o que vier depois de "recebe" para ser processado pela função.    
+                #valor = ' '.join(dlinha[3:])
+                #valor = monarca.processar_expressao(expressao=valor) # Envia tudo o que vier depois de "recebe" para ser processado pela função.    
                 monarca.escrever(texto=linha[17:])
 
         # WIP Verifica se o usuário quer abrir um bloco condicional

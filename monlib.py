@@ -30,100 +30,100 @@ class Monarca:
         print(f'\033[1;32m * Sugestão:\033[0m {dica}' if dica else '\r')
         exit()
 
-    def processar_variavel(self, dado):
-        try:
-            expressao = []
-            trecho = ''
-            ### Primeira etapa da função
-            # Nessa etapa, o Monarca quebra o dado recebido em diferentes partes e as armazena na lista "expressao".
-            # A ideia é identificar o que é string, o que é número, o que é variável, etc.
-            # Por exemplo, um dado "5 mais 5" eventualmente iria ficar {'5', 'mais', '5'}. Seriam dois valores numéricos e o operador "mais".
-            # Outro exemplo: Um dado ""Meu nome é " nome", supondo que "nome" seja uma variável de valor "Carlos", ficaria armazenado como {'"Meu nome é "', 'Carlos'}.
-            # A cada loop, um trecho é lido, interpretado e armazenado na lista "expressao".
-            # O trecho lido também é apagado da variável "dado", então o loop abaixo roda enquanto houver informação na variável.
-            while dado != '':
-                if dado[0] == "\"": # Checa se a expressão começa com aspa, ou seja, se há uma string logo no início. Se sim, checa se há outra aspa e caso haja armazena o trecho e o apaga da variável dado.
-                    c = dado.find("\"", 1) # Índice da próxima aspa
+    def identificar_elementos(self, expressao):
+        elementos = []
+        trecho = ''
+        # A cada loop, um trecho é lido, interpretado e armazenado na lista "elementos".
+        # O trecho lido também é apagado da variável "expressao", então o loop abaixo roda enquanto houver informação na variável.
+        # A seleção do trecho se baseia na existência de aspas ou não.
+        while expressao:
+                if expressao[0] == "\"": # Checa se a expressão começa com aspa, ou seja, se há uma string logo no início. Se sim, checa se há outra aspa e caso haja armazena o trecho e o apaga da variável dado.
+                    c = expressao.find("\"", 1) # Índice da próxima aspa
                     if c != -1: # Ou seja, se existe outra aspa para completar o par, já que seria -1 se não encontrasse.
-                        expressao.append(dado[0:c+1]) 
-                        dado = dado[c+1:] 
+                        elementos.append(expressao[0:c+1]) 
+                        expressao = expressao[c+1:] 
                         continue
                     else:   # Se não existe par, aponta erro
-                        raise Exception                 
+                        raise Exception  # COLOCAR UM ERRO MAIS ELABORADO AQUI               
                 else: # Em caso de não começar com aspa. Ou seja, poderia ser um número, uma variável, um operador etc.
-                    if "\"" in dado:                # Esse if...else checa se em dado momento aparecerá uma string. Se não aparecer, o código só lê tudo. Se aparecer, lê até o momento da string.
-                        c = dado.find("\"")
-                        trecho = dado[0:c]                        
-                        dado = dado[c:]
+                    if "\"" in expressao:                # Esse if...else checa se em dado momento aparecerá uma string. Se não aparecer, o código só lê tudo. Se aparecer, lê até o momento da string.
+                        c = expressao.find("\"")
+                        trecho = expressao[0:c]                        
+                        expressao = expressao[c:]
                     else:                    
-                        trecho = dado[0:]
-                        dado = ''
+                        trecho = expressao[0:]
+                        expressao = ''
                     for palavra in trecho.split(): # Leitura do trecho. Checa e substitui as variáveis, checa a validade dos números, etc
-                        if palavra.replace('\\', '') in self.variaveis.keys():
+                        if palavra in self.variaveis.keys():
                             palavra = self.variaveis[palavra]
-                        elif all(i in {"0","1","2","3","4","5","6","7","8","9",","} for i in palavra) and palavra.count(",") <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                    
+                        elif palavra.replace(',','').isnumeric() and palavra.count(",") <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                 
                             palavra = palavra.replace(",",".")  # Converte vírgula para ponto para poder ser lido nas operações.
                         elif not palavra in self.operações: # Se não for variável nem número, e também não for nenhuma operação, dá erro.
-                            self.erro(f'Não é possível resolver "{' '.join(trecho)}".')
-                        expressao.append(palavra) 
-            # Ao encerramento desse loop while, uma expressão "Oi, meu nome é " nome " e eu tenho " 23,5 mais 5,5 " anos", supondo que nome seja uma variável de valor "Carlos",
-            # ficaria uma lista ['"Oi, meu nome é "', '"Carlos"', '" e eu tenho "', '23.5', 'mais', '5.5', '" anos"']
-
-        except Exception:
-            self.erro('Dado, variável ou operação não reconhecido(a).')   
-        # Segunda parte da função, a etapa das operações.
+                            self.erro(f'Não é possível resolver "{''.join(trecho)}".')
+                        elementos.append(palavra)
+        return elementos
+    
+    def operacoes(self, elementos):
         i = 0
         try:      
-            while 'vezes' in expressao or 'dividindo' in expressao:                                      
-                if expressao[i] == 'vezes' or expressao[i] == 'dividindo':
-                    num1 = expressao[i - 1]
-                    num2 = expressao[i + 1]
-                    match expressao[i]:
+            while 'vezes' in elementos or 'dividindo' in elementos:                                      
+                if elementos[i] == 'vezes' or elementos[i] == 'dividindo':
+                    num1 = elementos[i - 1]
+                    num2 = elementos[i + 1]
+                    match elementos[i]:
                         case 'vezes':                        
                             resultado = float(num1) * float(num2)
                         case 'dividindo':
                             resultado = float(num1) / float(num2)
-                    expressao[i+1] = str(resultado)                   
-                    expressao.pop(i - 1)                    
-                    expressao.pop(i - 1)                                        
+                    elementos[i+1] = str(resultado)                   
+                    elementos.pop(i - 1)                    
+                    elementos.pop(i - 1)                                        
                 else:
                     i += 1 
             i = 0
-            while 'mais' in expressao or 'menos' in expressao:                                      
-                if expressao[i] == 'mais' or expressao[i] == 'menos':
-                    num1 = expressao[i - 1]
-                    num2 = expressao[i + 1]
-                    match expressao[i]:
+            while 'mais' in elementos or 'menos' in elementos:                                      
+                if elementos[i] == 'mais' or elementos[i] == 'menos':
+                    num1 = elementos[i - 1]
+                    num2 = elementos[i + 1]
+                    match elementos[i]:
                         case 'mais':                        
                             resultado = float(num1) + float(num2)
                         case 'menos':
                             resultado = float(num1) - float(num2)                    
-                    expressao[i+1] = str(resultado)                 
-                    expressao.pop(i - 1)                    
-                    expressao.pop(i - 1)                                        
+                    elementos[i+1] = str(resultado)                 
+                    elementos.pop(i - 1)                    
+                    elementos.pop(i - 1)                                        
                 else:
                     i += 1
+            return elementos
         except Exception:
-            self.erro(f'Não é possível resolver "{' '.join(expressao)}".')
+            self.erro(f'Não é possível resolver "{''.join(elementos)}".')
+
+    def processar_expressao(self, expressao):
+        # A função identificar_elementos divide a expressão em uma lista cujos elementos são separados levando em contas strings, números, operações, variáveis etc.
+        # Por exemplo, uma expressão "5 mais 5" eventualmente se tornaria {'5', 'mais', '5'}.
+        # Variáveis também são identificadas e substituídas.
+        # Ex: A expressão ""Meu nome é " nome", supondo que "nome" seja uma variável de valor "Carlos", ficaria armazenada como {'"Meu nome é "', 'Carlos'}.
+        elementos = self.identificar_elementos(expressao=expressao)
+        # Identifica os operadores e aplica os cálculos.
+        elementos = self.operacoes(elementos=elementos)
             
         # Terceira etapa: tipagem e finalização. Nesse ponto, se a expressão não retornar uma lista com um único elemento, será tratada como uma string. 
         # Também será tratada como string se tiver um único elemento envolto em aspas.
-
         # Converte ponto para vírgula
-        for i, palavra in enumerate(expressao):                
-            if all(c in {"0","1","2","3","4","5","6","7","8","9","."} for c in palavra):
-                expressao[i] = expressao[i].replace(".",",")
+        for i, palavra in enumerate(elementos):                
+            if palavra.replace('.','').isnumeric():
+                elementos[i] = elementos[i].replace(".",",")
 
-        if len(expressao) > 1 or expressao[0][0] == "\"":
-            expressao = "\"" + ''.join(expressao).replace("\"",'') + "\""
-            return expressao
+        if len(elementos) > 1 or elementos[0][0] == "\"":
+            elementos = "\"" + ''.join(elementos).replace("\"",'') + "\""
+            return elementos
         else:
-            i = expressao[0].find(".")              
-            if i != -1 and expressao[0][i + 1] == 0:
-                return expressao[0][0:i]
+            i = elementos[0].find(".")              
+            if i != -1 and elementos[0][i + 1] == 0:
+                return elementos[0][0:i]
             else:
-                return expressao[0]
-           
+                return elementos[0]           
 
     # Função usada pelo interpretador para entender automaticamente de que tipo são os dados escritos no código do usuário
     def tipo_de_dado(self, dado=''):
@@ -143,7 +143,7 @@ class Monarca:
     # Função análoga ao print
     def escrever(self, texto):
         if texto.strip() != '':
-            texto = self.processar_variavel(texto)
+            texto = self.processar_expressao(texto)
             texto = texto[1:len(texto)-1] if texto[0] == "\"" else texto # O Monarca guarda valores de strings com aspas. Para imprimir, removem-se estas aspas.
             print(texto)
         else:
@@ -158,56 +158,6 @@ class Monarca:
                 self.variaveis.pop(nome)
             else:
                 self.erro(f'Variável \033[1m\033[3m"{nome}"\033[0m não existente.')
-
-    # Função de operações aritméticas. Analisa primeiramente os operadores de multiplicação e divisão, depois os de adição e subtração.
-    def aritmetica(self, expressao):
-        total = 0
-        
-        # Continua rodando até que todos os operadores de multiplicação e divisão tenham sido substituídos pelos resultados numéricos de suas operações, para que só então as outras operações possam ser executadas.
-        while 'vezes' in expressao or 'dividindo' in expressao:
-            try:
-                if 'vezes' in expressao:
-                    n1 = expressao[expressao.index('vezes') - 1]
-                    n2 = expressao[expressao.index('vezes') + 1]
-                    resultado = float(n1)*float(n2)
-                    # Substitui a operação pelo resultado.
-                    expressao[expressao.index('vezes')+1] = resultado
-                    expressao.pop(expressao.index('vezes'))
-                    expressao.pop(expressao.index(n1))
-                    total = resultado
-                elif 'dividindo' in expressao:
-                    n1 = expressao[expressao.index('dividindo') - 1]
-                    n2 = expressao[expressao.index('dividindo') + 1]
-                    resultado = float(n1)/float(n2)
-                    # Substitui a operação pelo resultado
-                    expressao[expressao.index('dividindo')+1] = resultado
-                    expressao.pop(expressao.index('dividindo'))
-                    expressao.pop(expressao.index(n1))
-                    total = resultado
-    
-            except Exception:
-                self.erro(f'Expressão aritmética mal formulada.')
-
-        try:
-            for c in range(0, len(expressao)):
-                if expressao[c] == 'mais':
-                    if c == 1:
-                        total = float(expressao[c-1]) + float(expressao[c+1])
-                        c += 1
-                    else:
-                        total += float(expressao[c+1])
-
-                elif expressao[c] == 'menos':
-                    if c == 1: 
-                        total = float(expressao[c-1]) - float(expressao[c+1])
-                        c += 1
-                    else:
-                        total -= float(expressao[c+1])
-                                        
-            return total
-
-        except Exception:
-            self.erro(f'Expressão aritmética mal formulada.')
 
     # função para clonar o valor e o tipo de uma variável para a outra
     def clonar_valor(self, var1, var2):
@@ -235,4 +185,59 @@ class Monarca:
                     expressão.append("==")
                     indice += 1
             indice += 1
-        return eval(''.join(expressão))
+        return eval(''.join(expressão))  
+
+
+
+
+
+
+#  # Função de operações aritméticas. Analisa primeiramente os operadores de multiplicação e divisão, depois os de adição e subtração.
+#     def aritmetica(self, expressao):
+#         total = 0
+        
+#         # Continua rodando até que todos os operadores de multiplicação e divisão tenham sido substituídos pelos resultados numéricos de suas operações, para que só então as outras operações possam ser executadas.
+#         while 'vezes' in expressao or 'dividindo' in expressao:
+#             try:
+#                 if 'vezes' in expressao:
+#                     n1 = expressao[expressao.index('vezes') - 1]
+#                     n2 = expressao[expressao.index('vezes') + 1]
+#                     resultado = float(n1)*float(n2)
+#                     # Substitui a operação pelo resultado.
+#                     expressao[expressao.index('vezes')+1] = resultado
+#                     expressao.pop(expressao.index('vezes'))
+#                     expressao.pop(expressao.index(n1))
+#                     total = resultado
+#                 elif 'dividindo' in expressao:
+#                     n1 = expressao[expressao.index('dividindo') - 1]
+#                     n2 = expressao[expressao.index('dividindo') + 1]
+#                     resultado = float(n1)/float(n2)
+#                     # Substitui a operação pelo resultado
+#                     expressao[expressao.index('dividindo')+1] = resultado
+#                     expressao.pop(expressao.index('dividindo'))
+#                     expressao.pop(expressao.index(n1))
+#                     total = resultado
+    
+#             except Exception:
+#                 self.erro(f'Expressão aritmética mal formulada.')
+
+#         try:
+#             for c in range(0, len(expressao)):
+#                 if expressao[c] == 'mais':
+#                     if c == 1:
+#                         total = float(expressao[c-1]) + float(expressao[c+1])
+#                         c += 1
+#                     else:
+#                         total += float(expressao[c+1])
+
+#                 elif expressao[c] == 'menos':
+#                     if c == 1: 
+#                         total = float(expressao[c-1]) - float(expressao[c+1])
+#                         c += 1
+#                     else:
+#                         total -= float(expressao[c+1])
+                                        
+#             return total
+
+#         except Exception:
+#             self.erro(f'Expressão aritmética mal formulada.')
