@@ -14,5 +14,3 @@
 * (Para Ray) Modificar a parte do código que inverte vírgulas por pontos etc.
 
 # Lista de Bugs:
-* Números que poderiam ser inteiros são retornados como float.
-* Imprecisão no cálculo. 25 vezes 8,2 retorna 204,99999999999997 ao invés de 205. Tem a ver com o bug anterior.

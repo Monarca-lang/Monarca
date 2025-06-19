@@ -75,12 +75,15 @@ class Monarca:
             while 'vezes' in elementos or 'dividindo' in elementos:                                      
                 if elementos[i] == 'vezes' or elementos[i] == 'dividindo':
                     num1 = elementos[i - 1]
+                    num1 = float(num1) if '.' in num1 else int(num1)
                     num2 = elementos[i + 1]
+                    num2 = float(num2) if '.' in num2 else int(num2)
+                    
                     match elementos[i]:
                         case 'vezes':                        
-                            resultado = float(num1) * float(num2)
+                            resultado = num1 * num2
                         case 'dividindo':
-                            resultado = float(num1) / float(num2)
+                            resultado = num1 / num2
                     elementos[i+1] = str(resultado)                   
                     elementos.pop(i - 1)                    
                     elementos.pop(i - 1)                                        
@@ -90,12 +93,14 @@ class Monarca:
             while 'mais' in elementos or 'menos' in elementos:                                      
                 if elementos[i] == 'mais' or elementos[i] == 'menos':
                     num1 = elementos[i - 1]
+                    num1 = float(num1) if '.' in num1 else int(num1)
                     num2 = elementos[i + 1]
+                    num2 = float(num2) if '.' in num2 else int(num2)
                     match elementos[i]:
                         case 'mais':                        
-                            resultado = float(num1) + float(num2)
+                            resultado = num1 + num2
                         case 'menos':
-                            resultado = float(num1) - float(num2)                    
+                            resultado = num1 - num2                 
                     elementos[i+1] = str(resultado)                 
                     elementos.pop(i - 1)                    
                     elementos.pop(i - 1)                                        
@@ -113,8 +118,7 @@ class Monarca:
                 else:
                     i += 1                 
             return elementos
-        except Exception as i:
-            print(i)
+        except Exception:
             self.erro(f'Não é possível resolver "{' '.join(elementos)}".')
 
     def processar_expressao(self, expressao):
