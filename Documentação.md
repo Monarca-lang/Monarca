@@ -117,7 +117,7 @@ A utilização destes operadores foi desenhada para a mais intuitiva possível. 
 
 ```pseudocode
 variável idade recebe inteiro 20 menos 10 mais 5
-mostrar na tela: Minha idade é \idade
+mostrar na tela: "Minha idade é " idade
 
 ::info Saída
 ::info Minha idade é 15
@@ -147,9 +147,9 @@ Se "a" é igual "b" então:
     Você deve ter percebido que, ao longo desse documento, as saídas de comandos foram precedidas por "::info". Essa sintaxe, ao ser reconhecida pelo interpretador, faz com que a linha onde ela aparece não seja alvo de checagens de comandos, tendo a mesma funcionalidade que comentários em outras linguagens de programação.
     Exemplo:
   ```pseudocode
-  mostrar na tela: Hoje eu fui no parque
+  mostrar na tela: "Hoje eu fui no parque"
   ::info mostrar na tela: tomei um sorvete
-  mostrar na tela: e depois voltei pra casa
+  mostrar na tela: "e depois voltei pra casa"
   
   ::info Saída:
   ::info Hoje eu fui no parque
