@@ -21,34 +21,12 @@ except Exception:
     monarca.erro(f'Arquivo {argumentos.script} não encontrado.')
 
 # A variável c é o índice da linha, e a variável linha contém o texto da linha em si. A cada laço é interpretada uma linha do script.
-for c, linha in enumerate(script):    
+for c, linha in enumerate(script):
     linha = linha.replace('\n', '') # Impede que a quebra de linha atrapalhe a leitura dos dados
-
-    # Todo esse bloco serve para checar a identação e saber quais linhas ler dependendo do bloco "se".
-    numEspaços = 0
-    for caractere in linha:  # Esse loop serve pra identificar a identação da linha
-        if caractere != ' ':
-            break
-        numEspaços += 1
-    if numEspaços % 4 != 0:  # Esse valor 4 é porque 1 TAB equivale a 4 espaços em Python. Se o programador colocar uma identação estranha, vai dar erro.
-        monarca.erro('Erro de identação. Consulte a documentação.')  
-    numEspaços /= 4
-    if numEspaços > monarca.chaveSE[0]:
-        if monarca.chaveSE[1] == False:
-            continue
-        else:
-            monarca.erro('Erro de identação. Consulte a documentação.')    
-    elif numEspaços == monarca.chaveSE[0] and monarca.chaveSE[1] == False:
-        continue
-    elif numEspaços < monarca.chaveSE[0]:
-        monarca.chaveSE[0] = numEspaços
-        monarca.chaveSE[1] = True   
 
     if '::info' in linha:   # Ignora comentários
         índice = linha.find('::info')
         linha = linha[:índice]
-    
-    linha = linha.lstrip()
 
     dlinha = linha.split(' ') # Lista que contém a linha dividida em palavras.    
     if linha.strip() == '': # Checa se é uma linha vazia. Se sim, apenas pula para a próxima.
@@ -92,17 +70,15 @@ for c, linha in enumerate(script):
                 dica = f'mostrar na \033[1;32mtela:\033[0m {' '.join(dlinha[3:]) if len(dlinha)>3 else "[valor de sua escolha]"} '
                 monarca.erro(f'A palavra "tela:" deve ser explicitada no comando "mostrar na tela".', dica)
             else:
+                #valor = ' '.join(dlinha[3:])
+                #valor = monarca.processar_expressao(expressao=valor) # Envia tudo o que vier depois de "recebe" para ser processado pela função.    
                 monarca.escrever(texto=linha[17:])
+
+        # WIP Verifica se o usuário quer abrir um bloco condicional
         elif dlinha[0] == 'se':
-            if dlinha[-1] != 'então:':
-                dica = f'se [condição] \033[1;32mentão:\033[0m' # 
-                monarca.erro(f'A palavra "então:" deve ser explicitada no comando "se [condição] então:".', dica)
-            else:
-                monarca.chaveSE[0] += 1
-                valor = ' '.join(dlinha[1:len(dlinha)-1])
-                valor = monarca.processar_expressao(expressao=valor)
-                if valor == 'falso' or (valor.isnumeric() and int(valor) == 0):
-                    monarca.chaveSE[1] = False
+            condições = [x for x in dlinha[3:-1]]
+            if monarca.condicional_se(condições):
+                pass
     # Entrega um erro e uma sugestão de correção caso o comando não esteja previsto na documentação. 
     else:
         distancias = [distance(dlinha[0], palavra) for palavra in monarca.palavras_reservadas]
@@ -113,8 +89,6 @@ for c, linha in enumerate(script):
             dica = f'\033[1;32mvariável\033[0m [nome de sua escolha] recebe [valor de sua escolha]'
         elif chute == 'deletar':
             dica = f'\033[1;32mdeletar\033[0m variável [variável de sua escolha]'
-        elif chute == 'se':
-            dica = f'\033[1;32mse\033[0m [condição] então:'
         
         monarca.erro(f'Comando "{dlinha[0]}" não encontrado. Consulte a documentação.', dica)   
         
