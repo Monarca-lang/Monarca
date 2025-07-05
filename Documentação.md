@@ -24,14 +24,6 @@ Para deletar uma variável já criada, basta seguir a sintaxe:
 deletar variável [nome da variável]
 ```
 Se a variável realmente existir, ela será deletada instantâneamente e seu espaço na memória será liberado, dando ao usuário da linguagem uma autonomia parcial sobre o consumo de memória de seus programas.
-### Clonar
-Para clonar o valor e o tipo de uma variável já criada para outra variável, basta adicionar:
-```
-clonar variável [nome da variável a ser clonada] para [nome da variável alvo] 
-```
-Caso a variável a ser clonada exista na memória, todos os seus dados - com exceção do nome - serão clonados para a variável alvo.
-
-Este comando não checa se a variável alvo existe na memória.
 
 ## Tipos Primitivos de Dados
 
@@ -63,11 +55,18 @@ Os tipos primitivos de dados presentes na linguagem Monarca podem ser listados e
     Por exemplo:
 
     ```pseudocode
-    "a" é igual a "b"
-    5 é menor que 2
-    1,7 é diferente de "casa"
+    "a" é igual a "b"         - falso
+    5 é menor que 2           - falso
+    1,7 é diferente de "casa" - verdadeiro
     ```
 
+    Operações lógicas também podem ser feitas entre operações matemáticas, comparando seus resultados:
+    
+    ```pseudocode
+    5 vezes 2 é igual a 10         - verdadeiro
+    8 menos 3 vezes 2 é igual a 10 - falso
+    ```
+    
     
 
 
@@ -111,12 +110,12 @@ No Monarca existem basicamente 4 operadores aritméticos:
 * **mais**: Operador de adição.
 * **menos**: Operador de subtração.
 * **vezes**: Operador de multiplicação.
-* **dividindo**: Operador de divisão.
+* **dividido por**: Operador de divisão.
 
 A utilização destes operadores foi desenhada para a mais intuitiva possível. Por exemplo:
 
 ```pseudocode
-variável idade recebe inteiro 20 menos 10 mais 5
+variável idade recebe 20 menos 10 vezes 5
 mostrar na tela: "Minha idade é " idade
 
 ::info Saída
