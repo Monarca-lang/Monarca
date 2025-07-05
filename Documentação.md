@@ -24,14 +24,6 @@ Para deletar uma variável já criada, basta seguir a sintaxe:
 deletar variável [nome da variável]
 ```
 Se a variável realmente existir, ela será deletada instantâneamente e seu espaço na memória será liberado, dando ao usuário da linguagem uma autonomia parcial sobre o consumo de memória de seus programas.
-### Clonar
-Para clonar o valor e o tipo de uma variável já criada para outra variável, basta adicionar:
-```
-clonar variável [nome da variável a ser clonada] para [nome da variável alvo] 
-```
-Caso a variável a ser clonada exista na memória, todos os seus dados - com exceção do nome - serão clonados para a variável alvo.
-
-Este comando não checa se a variável alvo existe na memória.
 
 ## Tipos Primitivos de Dados
 
