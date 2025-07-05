@@ -1,6 +1,7 @@
 class Monarca:
     def __init__(self, linha=0):
         self.linha = linha
+        self.chaveSE = [0, True] # Camada de identação / Se a camada é pra ser lida ou não(No caso por exemplo de um bloco if cuja condicional é falsa)
         self.variaveis = {}
         self.palavras_reservadas = (
             'mostrar',
@@ -15,7 +16,6 @@ class Monarca:
             'dividindo',
             'igual'
         )
-        #eu juro que eu vou incorporar isso de maneira mais clean no resto do código depois
         self.opcondicionais = {
             'é igual a',
             'é diferente de',
@@ -63,7 +63,6 @@ class Monarca:
                         elif palavra.replace(',','').isnumeric() and palavra.count(",") <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                 
                             palavra = palavra.replace(",",".")  # Converte vírgula para ponto para poder ser lido nas operações.
                         elif not any(palavra in operador.split() for operador in self.opcondicionais) and not palavra in self.operações and not palavra in self.booleanos: # Se não for variável, nem número, nem booleano e nem operação, dá erro.
-                            print(palavra)
                             self.erro(f'Não é possível resolver "{''.join(trecho)}".')
                         elementos.append(palavra)
         return elementos
@@ -242,80 +241,3 @@ class Monarca:
                 self.variaveis.pop(nome)
             else:
                 self.erro(f'Variável \033[1m\033[3m"{nome}"\033[0m não existente.')
-
-    # funções condicionais, extremamente WIP
-    # só retorna se o resultado da condição é verdadeira ou não e só funciona com equações de valores numéricos declarados na hora,
-    # mas eventualmente vai ficar fully fledged
-    def condicional_se(self, condições):
-        # pega as condições "brutas" e trata elas
-        condições = [x.strip('",') for x in condições]
-        # faz o resto dos b.o
-        expressão = []
-        indice = 0
-        while indice != len(condições):
-            elemento = condições[indice]
-            if elemento.isnumeric():
-                expressão.append(elemento)
-            else:
-                if elemento in self.opcondicionais:
-                    expressão.append(self.opcondicionais[elemento])
-                elif elemento == "igual":
-                    expressão.append("==")
-                    indice += 1
-            indice += 1
-        return eval(''.join(expressão))  
-
-
-
-
-
-
-#  # Função de operações aritméticas. Analisa primeiramente os operadores de multiplicação e divisão, depois os de adição e subtração.
-#     def aritmetica(self, expressao):
-#         total = 0
-        
-#         # Continua rodando até que todos os operadores de multiplicação e divisão tenham sido substituídos pelos resultados numéricos de suas operações, para que só então as outras operações possam ser executadas.
-#         while 'vezes' in expressao or 'dividindo' in expressao:
-#             try:
-#                 if 'vezes' in expressao:
-#                     n1 = expressao[expressao.index('vezes') - 1]
-#                     n2 = expressao[expressao.index('vezes') + 1]
-#                     resultado = float(n1)*float(n2)
-#                     # Substitui a operação pelo resultado.
-#                     expressao[expressao.index('vezes')+1] = resultado
-#                     expressao.pop(expressao.index('vezes'))
-#                     expressao.pop(expressao.index(n1))
-#                     total = resultado
-#                 elif 'dividindo' in expressao:
-#                     n1 = expressao[expressao.index('dividindo') - 1]
-#                     n2 = expressao[expressao.index('dividindo') + 1]
-#                     resultado = float(n1)/float(n2)
-#                     # Substitui a operação pelo resultado
-#                     expressao[expressao.index('dividindo')+1] = resultado
-#                     expressao.pop(expressao.index('dividindo'))
-#                     expressao.pop(expressao.index(n1))
-#                     total = resultado
-    
-#             except Exception:
-#                 self.erro(f'Expressão aritmética mal formulada.')
-
-#         try:
-#             for c in range(0, len(expressao)):
-#                 if expressao[c] == 'mais':
-#                     if c == 1:
-#                         total = float(expressao[c-1]) + float(expressao[c+1])
-#                         c += 1
-#                     else:
-#                         total += float(expressao[c+1])
-
-#                 elif expressao[c] == 'menos':
-#                     if c == 1: 
-#                         total = float(expressao[c-1]) - float(expressao[c+1])
-#                         c += 1
-#                     else:
-#                         total -= float(expressao[c+1])
-                                        
-#             return total
-
-#         except Exception:
-#             self.erro(f'Expressão aritmética mal formulada.')
