@@ -1,6 +1,7 @@
 class Monarca:
     def __init__(self, linha=0):
         self.linha = linha
+        self.chaveSE = [0, True] # Camada de identação / Se a camada é pra ser lida ou não(No caso por exemplo de um bloco if cuja condicional é falsa)
         self.variaveis = {}
         self.palavras_reservadas = (
             'mostrar',
@@ -15,7 +16,6 @@ class Monarca:
             'dividido por',
             'igual'
         )
-        #eu juro que eu vou incorporar isso de maneira mais clean no resto do código depois
         self.opcondicionais = {
             'é igual a',
             'é diferente de',
@@ -252,25 +252,3 @@ class Monarca:
                 self.variaveis.pop(nome)
             else:
                 self.erro(f'Variável \033[1m\033[3m"{nome}"\033[0m não existente.')
-
-    # funções condicionais, extremamente WIP
-    # só retorna se o resultado da condição é verdadeira ou não e só funciona com equações de valores numéricos declarados na hora,
-    # mas eventualmente vai ficar fully fledged
-    def condicional_se(self, condições):
-        # pega as condições "brutas" e trata elas
-        condições = [x.strip('",') for x in condições]
-        # faz o resto dos b.o
-        expressão = []
-        indice = 0
-        while indice != len(condições):
-            elemento = condições[indice]
-            if elemento.isnumeric():
-                expressão.append(elemento)
-            else:
-                if elemento in self.opcondicionais:
-                    expressão.append(self.opcondicionais[elemento])
-                elif elemento == "igual":
-                    expressão.append("==")
-                    indice += 1
-            indice += 1
-        return eval(''.join(expressão))  
