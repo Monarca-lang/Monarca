@@ -1,25 +1,16 @@
 # Sintaxe Base
 
-## Tipos Primitivos de Dados
-
-Os tipos primitivos de dados presentes na linguagem Monarca podem ser listados em:
-
-* **Inteiro**: Representa qualquer número no conjunto dos números inteiros. Passível de sofrer operações aritméticas.
-* **Real**: Representa qualquer número no conjunto dos números reais. Passível de sofrer operações aritméticas.
-* **Texto**: Representa qualquer caractere visual dentro do padrão UTF-8. Não está passível de sofrer operações aritméticas e precisa estar envolvido por aspas duplas ( "" ).
-* **Lógico**: Representa operações lógicas ou seus resultados, que podem ser Verdadeiro ou Falso.
-
 ## Variáveis
 ### Inicializar
 Para inicializar uma variável, basta seguir a seguinte sintaxe, inserindo (de acordo com a necessidade) o nome da mesma e seu valor:
 
-```
+```pseudocode
 variável [nome da variável] recebe [dado]
 ```
 
 Perceba que não é necessário declarar seu tipo primitivo, apenas seu nome e seu valor. Em uma aplicação real, esta sintaxe se pareceria com o seguinte exemplo:
 
-```
+```pseudocode
 variável idade recebe 30
 variável nome recebe "Monteiro"
 variável altura recebe 1,60
@@ -29,7 +20,7 @@ variável gosta_de_paçoca? recebe Verdadeiro
 Nomes de variáveis não podem ter espaços, embora possam conter caracteres especiais.
 ### Deletar
 Para deletar uma variável já criada, basta seguir a sintaxe:
-```
+```pseudocode
 deletar variável [nome da variável]
 ```
 Se a variável realmente existir, ela será deletada instantâneamente e seu espaço na memória será liberado, dando ao usuário da linguagem uma autonomia parcial sobre o consumo de memória de seus programas.
@@ -41,13 +32,52 @@ clonar variável [nome da variável a ser clonada] para [nome da variável alvo]
 Caso a variável a ser clonada exista na memória, todos os seus dados - com exceção do nome - serão clonados para a variável alvo.
 
 Este comando não checa se a variável alvo existe na memória.
+
+## Tipos Primitivos de Dados
+
+Os tipos primitivos de dados presentes na linguagem Monarca podem ser listados em:
+
+* **Inteiro**: Representa qualquer número no conjunto dos números inteiros. Passível de sofrer operações aritméticas.
+
+* **Real**: Representa qualquer número no conjunto dos números reais. Passível de sofrer operações aritméticas.
+
+* **Texto**: Representa qualquer caractere visual dentro do padrão UTF-8. Não está passível de sofrer operações aritméticas e precisa estar envolvido por aspas duplas ( "" ).
+
+* **Lógico**: Representa operações lógicas ou seus resultados, que podem ser Verdadeiro ou Falso. Uma declaração lógica é composta por três tipos de informações:
+
+  * **Operadores**: Como exemplos de operadores temos:
+
+    * **igual a**: Utilizado para verificar se dois dados ou variáveis são *exatamente* iguais.
+    * **diferente de**: Utilizado para verificar se existe *qualquer mínima* diferença entre dois dados ou variáveis.
+    * **menor que**: Utilizado para verificar se um dado numérico é menor que outro.
+    * **maior que**: Utilizado para verificar se um dado numérico é maior que outro.
+
+  * **Dados**: Os dados utilizados em declarações lógicas podem ser de qualquer um dos tipos listados acima (*inteiro*, *real*, *texto*, ou até mesmo *lógico*).
+
+  * **Sintaxe**: A sintaxe de uma declaração lógica é estruturada da seguinte forma:
+
+    ```pseudocode
+    [dado] é [operador] [dado]
+    ```
+
+    Por exemplo:
+
+    ```pseudocode
+    "a" é igual a "b"
+    5 é menor que 2
+    1,7 é diferente de "casa"
+    ```
+
+    
+
+
 # Funções Básicas
 
 ## mostrar na tela:
 
 A função "***mostrar na tela:***"  só possui como parâmetro o conteúdo a ser exibido na tela. Este deve estar a 1 caractere de espaço (" ") de distância após o caractere de dois pontos ( : ) e precisa estar envolvido por aspas duplas ( "" ). Exemplo:
 
-```
+```pseudocode
 mostrar na tela: "Olá Mundo em Monarca!"
 
 ::info Saída:
@@ -56,7 +86,7 @@ mostrar na tela: "Olá Mundo em Monarca!"
 
 Esta função também pode ser usada referenciando-se uma variável no campo dos dados:
 
-```
+```pseudocode
 variável nome recebe "Maria"
 mostrar na tela: nome
 
@@ -66,7 +96,7 @@ mostrar na tela: nome
 
 Além disto, é possível exibir texto direto e conteúdo de variável ao mesmo tempo:
 
-```
+```pseudocode
 variável meu_nome recebe "Paulo"
 mostrar na tela: "Olá, meu nome é " meu_nome "!"
 
@@ -85,7 +115,7 @@ No Monarca existem basicamente 4 operadores aritméticos:
 
 A utilização destes operadores foi desenhada para a mais intuitiva possível. Por exemplo:
 
-```
+```pseudocode
 variável idade recebe inteiro 20 menos 10 mais 5
 mostrar na tela: Minha idade é \idade
 
@@ -95,6 +125,20 @@ mostrar na tela: Minha idade é \idade
 
 Desta forma, é possível encadear diversas operações uma após a outra, de modo que sejam executadas pela ordem aritmética comum/correta.
 
+# Estruturas Condicionais
+## Se (ainda desenvolvendo sintaxe)
+A estrutura `se` pode ser utilizada para iniciar um bloco de comandos a serem executados caso uma certa declaração lógica (booleana) seja interpretada como verdadeira. 
+
+Exemplo:
+
+```pseudocode
+Se "a" é igual "b" então:
+    mostrar na tela: "a é igual a b"
+```
+
+
+
+
 # Questionamentos Previstos:
 
 
@@ -102,13 +146,12 @@ Desta forma, é possível encadear diversas operações uma após a outra, de mo
 
     Você deve ter percebido que, ao longo desse documento, as saídas de comandos foram precedidas por "::info". Essa sintaxe, ao ser reconhecida pelo interpretador, faz com que a linha onde ela aparece não seja alvo de checagens de comandos, tendo a mesma funcionalidade que comentários em outras linguagens de programação.
     Exemplo:
-  ```
+  ```pseudocode
   mostrar na tela: Hoje eu fui no parque
   ::info mostrar na tela: tomei um sorvete
   mostrar na tela: e depois voltei pra casa
-
+  
   ::info Saída:
   ::info Hoje eu fui no parque
-  ::info e depois voltei pra casa  ```
-
+  ::info e depois voltei pra casa
 

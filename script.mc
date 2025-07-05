@@ -1,10 +1,12 @@
 ::info As linhas abaixo são casos de teste para exemplificar o sistema de erro atualizado. Sugiro ir corrigindo cada linha para ver os seguintes casos de erro.
-morar na tela: "Vai Irã!"
-mostrar em tela: "Vai Irã!"
-mostrar na tela "Vai Irã!"
-variáv recebe "Monarca"
-variável idade 2 vezes 8 menos a
-mostrar na tela: "Eu sou uma linguagem de programação de alto nível, nomeada " nome "!"
-mostrar na tela: "Eu tenho apenas " idade " semanas de idade"
-mostrar na tela: "oi" igual "oi"
-mostrar na tela: "oi" igual "olá"
+::info mostrar na tela: "Vai Irã!"
+::info mostrar na tela: "Vai Irã!"
+::info mostrar na tela: "Vai Irã!"
+::info variável nome recebe 5 igual 5
+::info variável idade recebe 2 vezes 8 menos 9
+::info mostrar na tela: "Eu sou uma linguagem de programação de alto nível, nomeada " nome "!"
+::info mostrar na tela: "Eu tenho apenas " idade " semanas de idade"
+::info mostrar na tela: nome
+variável n recebe 9
+variável m recebe 5,9
+mostrar na tela: n é menor que m é igual a falso

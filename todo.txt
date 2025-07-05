@@ -1,6 +1,6 @@
 * Reportar bugs
 * CORRIGIR BUGS!
-* Implementar operações lógicas (booleanas)
+* Implementar operações lógicas (booleanas) - Feito parcialmente
 * Implementar conversão de tipos
 * Implementar desvios condicionais
 * Implementar laços de repetição

@@ -5,7 +5,6 @@ class Monarca:
         self.palavras_reservadas = (
             'mostrar',
             'variável',
-            'clonar',
             'deletar',
             'se'
         )
@@ -18,10 +17,10 @@ class Monarca:
         )
         #eu juro que eu vou incorporar isso de maneira mais clean no resto do código depois
         self.opcondicionais = {
-            'mais': '+',
-            'menos': '-',
-            'vezes': '*',
-            'dividindo': '/'
+            'é igual a',
+            'é diferente de',
+            'é menor que',
+            'é maior que'
         }
         self.booleanos = (
             'verdadeiro',
@@ -63,8 +62,7 @@ class Monarca:
                             palavra = self.variaveis[palavra]
                         elif palavra.replace(',','').isnumeric() and palavra.count(",") <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                 
                             palavra = palavra.replace(",",".")  # Converte vírgula para ponto para poder ser lido nas operações.
-                        elif not palavra in self.operações and not palavra in self.booleanos: # Se não for variável, nem número, nem booleano e nem operação, dá erro.
-                            print("erro", palavra)
+                        elif not any(palavra in operador.split() for operador in self.opcondicionais) and not palavra in self.booleanos: # Se não for variável, nem número, nem booleano e nem operação, dá erro.
                             self.erro(f'Não é possível resolver "{''.join(trecho)}".')
                         elementos.append(palavra)
         return elementos
@@ -107,18 +105,82 @@ class Monarca:
                 else:
                     i += 1
             i = 0
-            while 'igual' in elementos:
+            while any(operador in elementos for operador in ['igual', 'menor', 'maior', 'diferente']):
                 if elementos[i] == 'igual':
-                    num1 = elementos[i - 1]
-                    num2 = elementos[i + 1]
+                    # Verificação de erros de sintaxe
+                    if elementos[i - 1] != 'é':
+                        dica = f'{elementos[i-1]} \033[1;32mé\033[0m igual a {elementos[i+2] if elementos[i+1] == 'a' and len(elementos)>=elementos.index(elementos[i]) else elementos[i+1]}'
+                        self.erro('O termo "é" deve ser explicitado na declaração lógica.', dica)
+                    elif elementos[i+1] != 'a':
+                        dica = f'{elementos[i-2]} é igual\033[1;32m a\033[0m {elementos[i+1]}'
+                        self.erro('O termo "a" deve ser explicitado ao usar o operador "igual a".', dica)    
+                          
+                    num1 = float(elementos[i - 2].replace(',', '.')) if elementos[i - 2].replace(',', '').isnumeric() else elementos[i - 2]
+                    num2 = float(elementos[i + 2].replace(',', '.')) if elementos[i + 2].replace(',', '').isnumeric() else elementos[i + 2]
                     resultado = 'verdadeiro' if num1 == num2 else 'falso'
-                    elementos[i+1] = str(resultado)                 
-                    elementos.pop(i - 1)                    
-                    elementos.pop(i - 1)
+                    elementos[i+2] = str(resultado)
+                    elementos = elementos[i+2:]
+                    i = 0
+
+                elif elementos[i] == 'diferente':
+                    # Verificação de erros de sintaxe
+                    if elementos[i - 1] != 'é':
+                        dica = f'{elementos[i-1]} \033[1;32mé\033[0m diferente de {elementos[i+2] if elementos[i+1] == 'de' and len(elementos)>=elementos.index(elementos[i]) else elementos[i+1]}'
+                        self.erro('O termo "é" deve ser explicitado na declaração lógica "diferente de".', dica)
+                    elif elementos[i+1] != 'de':
+                        dica = f'{elementos[i-2]} é diferente\033[1;32m de\033[0m {elementos[i+1]}'
+                        self.erro('O termo "de" deve ser explicitado ao usar o operador "diferente de".', dica)    
+                    
+                    num1 = float(elementos[i - 2].replace(',', '.')) if elementos[i - 2].replace(',', '').isnumeric() else elementos[i - 2]
+                    num2 = float(elementos[i + 2].replace(',', '.')) if elementos[i + 2].replace(',', '').isnumeric() else elementos[i + 2]
+                    resultado = 'verdadeiro' if num1 != num2 else 'falso'
+                    elementos[i+2] = str(resultado)
+                    elementos = elementos[i+2:]
+                    i = 0
+
+                elif elementos[i] == 'maior':
+                    # Verificação de erros de sintaxe
+                    if elementos[i - 1] != 'é':
+                        dica = f'{elementos[i-1]} \033[1;32mé\033[0m maior que {elementos[i+2] if elementos[i+1] == 'que' and len(elementos)>=elementos.index(elementos[i]) else elementos[i+1]}'
+                        self.erro('O termo "é" deve ser explicitado na declaração lógica "maior que".', dica)
+                    elif elementos[i+1] != 'que':
+                        dica = f'{elementos[i-2]} é maior\033[1;32m que\033[0m {elementos[i+1]}'
+                        self.erro('O termo "que" deve ser explicitado ao usar o operador "maior que".', dica)    
+                    elif not elementos[i-2].replace(',', '').isnumeric() or not elementos[i+2].replace(',', '').isnumeric():
+                        dica = f'{elementos[i-2] if elementos[i-2].isnumeric() else '\033[1;32m[número]\033[0m'} é maior que {elementos[i+2] if elementos[i+2].isnumeric() else '\033[1;32m[número]\033[0m'}'
+                        self.erro('Dados numéricos devem ser explicitados ao utilizar o operador "maior que".', dica)
+                    
+                    num1 = float(elementos[i - 2].replace(',', '.'))
+                    num2 = float(elementos[i + 2].replace(',', '.'))
+                    resultado = 'verdadeiro' if num1 > num2 else 'falso'
+                    elementos[i+2] = str(resultado)
+                    elementos = elementos[i+2:]
+                    i = 0
+                
+                elif elementos[i] == 'menor':
+                    # Verificação de erros de sintaxe
+                    if elementos[i - 1] != 'é':
+                        dica = f'{elementos[i-1]} \033[1;32mé\033[0m menor que {elementos[i+2] if elementos[i+1] == 'que' and len(elementos)>=elementos.index(elementos[i]) else elementos[i+1]}'
+                        self.erro('O termo "é" deve ser explicitado na declaração lógica "menor que".', dica)
+                    elif elementos[i+1] != 'que':
+                        dica = f'{elementos[i-2]} é menor\033[1;32m que\033[0m {elementos[i+1]}'
+                        self.erro('O termo "que" deve ser explicitado ao usar o operador "menor que".', dica)    
+                    elif not elementos[i-2].replace(',', '').isnumeric() or not elementos[i+2].replace(',', '').isnumeric():
+                        dica = f'{elementos[i-2] if elementos[i-2].isnumeric() else '\033[1;32m[número]\033[0m'} é menor que {elementos[i+2] if elementos[i+2].isnumeric() else '\033[1;32m[número]\033[0m'}'
+                        self.erro('Dados numéricos devem ser explicitados ao utilizar o operador "menor que".', dica)
+                    
+                    num1 = float(elementos[i - 2].replace(',', '.'))
+                    num2 = float(elementos[i + 2].replace(',', '.'))
+                    resultado = 'verdadeiro' if num1 < num2 else 'falso'
+                    elementos[i+2] = str(resultado)
+                    elementos = elementos[i+2:]
+                    i = 0
+                
                 else:
-                    i += 1                 
+                    i += 1
             return elementos
-        except Exception:
+        except Exception as e:
+            print(e)
             self.erro(f'Não é possível resolver "{' '.join(elementos)}".')
 
     def processar_expressao(self, expressao):
@@ -180,12 +242,6 @@ class Monarca:
                 self.variaveis.pop(nome)
             else:
                 self.erro(f'Variável \033[1m\033[3m"{nome}"\033[0m não existente.')
-
-    # função para clonar o valor e o tipo de uma variável para a outra
-    def clonar_valor(self, var1, var2):
-        if var1 in self.variaveis.keys() and var2 in self.variaveis.keys():
-            self.variaveis[var2] = self.variaveis[var1]
-            self.vartipos[var2] = self.vartipos[var1]
 
     # funções condicionais, extremamente WIP
     # só retorna se o resultado da condição é verdadeira ou não e só funciona com equações de valores numéricos declarados na hora,

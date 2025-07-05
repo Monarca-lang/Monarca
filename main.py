@@ -61,12 +61,6 @@ for c, linha in enumerate(script):
             else:
                 monarca.variavel('del', dlinha[2])
             
-        # Verifica se o usuário quer clonar o valor de uma variável
-        elif dlinha[0] == 'clonar' and dlinha[1] == 'variável':
-            if dlinha[1] != 'variável':
-                dica = f'clonar \033[1;32mvariável\033[0m {dlinha[2] if len(dlinha) >= 3 else "[variável de sua escolha]"} para {dlinha[4] if len(dlinha) >= 5 else "[variável de sua escolha]"}'
-            monarca.clonar_valor(dlinha[2], dlinha[4])
-            
         # Verifica se o usuário quer mostrar uma mensagem na tela
         elif dlinha[0] == 'mostrar':
             if dlinha[1] != 'na':
@@ -95,10 +89,8 @@ for c, linha in enumerate(script):
             dica = f'\033[1;32mvariável\033[0m [nome de sua escolha] recebe [valor de sua escolha]'
         elif chute == 'deletar':
             dica = f'\033[1;32mdeletar\033[0m variável [variável de sua escolha]'
-        elif chute == 'clonar':
-            dica = f'\033[1;32mclonar\033[0m variável [variável de sua escolha] para [variável de sua escolha]'
         
-        monarca.erro(f'Comando "{dlinha[0]}" desconhecido. Consulte a documentação.', dica)   
+        monarca.erro(f'Comando "{dlinha[0]}" não encontrado. Consulte a documentação.', dica)   
         
 tempo_final = time()
 print(f'\n\033[1;33mTempo de execução: {tempo_final-tempo_inicial:.4f} segundos.\033[m')
