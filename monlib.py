@@ -12,7 +12,7 @@ class Monarca:
             'mais',
             'menos',
             'vezes',
-            'dividindo',
+            'dividido por',
             'igual'
         )
         #eu juro que eu vou incorporar isso de maneira mais clean no resto do código depois
@@ -41,51 +41,63 @@ class Monarca:
         # O trecho lido também é apagado da variável "expressao", então o loop abaixo roda enquanto houver informação na variável.
         # A seleção do trecho se baseia na existência de aspas ou não.
         while expressao:
-                if expressao[0] == "\"": # Checa se a expressão começa com aspa, ou seja, se há uma string logo no início. Se sim, checa se há outra aspa e caso haja armazena o trecho e o apaga da variável dado.
-                    c = expressao.find("\"", 1) # Índice da próxima aspa
-                    if c != -1: # Ou seja, se existe outra aspa para completar o par, já que seria -1 se não encontrasse.
-                        elementos.append(expressao[0:c+1]) 
-                        expressao = expressao[c+1:] 
-                        continue
-                    else:   # Se não existe par, aponta erro
-                        raise Exception  # COLOCAR UM ERRO MAIS ELABORADO AQUI               
-                else: # Em caso de não começar com aspa. Ou seja, poderia ser um número, uma variável, um operador etc.
-                    if "\"" in expressao:                # Esse if...else checa se em dado momento aparecerá uma string. Se não aparecer, o código só lê tudo. Se aparecer, lê até o momento da string.
-                        c = expressao.find("\"")
-                        trecho = expressao[0:c]                        
-                        expressao = expressao[c:]
-                    else:                    
-                        trecho = expressao[0:]
-                        expressao = ''
-                    for palavra in trecho.split(): # Leitura do trecho. Checa e substitui as variáveis, checa a validade dos números, etc
-                        if palavra in self.variaveis.keys():
-                            palavra = self.variaveis[palavra]
-                        elif palavra.replace(',','').isnumeric() and palavra.count(",") <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                 
-                            palavra = palavra.replace(",",".")  # Converte vírgula para ponto para poder ser lido nas operações.
-                        elif not any(palavra in operador.split() for operador in self.opcondicionais) and not palavra in self.operações and not palavra in self.booleanos: # Se não for variável, nem número, nem booleano e nem operação, dá erro.
-                            print(palavra)
-                            self.erro(f'Não é possível resolver "{''.join(trecho)}".')
-                        elementos.append(palavra)
+            if expressao[0] == "\"": # Checa se a expressão começa com aspa, ou seja, se há uma string logo no início. Se sim, checa se há outra aspa e caso haja armazena o trecho e o apaga da variável dado.
+                c = expressao.find("\"", 1) # Índice da próxima aspa
+                if c != -1: # Ou seja, se existe outra aspa para completar o par, já que seria -1 se não encontrasse.
+                    elementos.append(expressao[0:c+1]) 
+                    expressao = expressao[c+1:] 
+                    continue
+                else:   # Se não existe par, aponta erro
+                    raise Exception  # COLOCAR UM ERRO MAIS ELABORADO AQUI               
+            else: # Em caso de não começar com aspa. Ou seja, poderia ser um número, uma variável, um operador etc.
+                if "\"" in expressao:                # Esse if...else checa se em dado momento aparecerá uma string. Se não aparecer, o código só lê tudo. Se aparecer, lê até o momento da string.
+                    c = expressao.find("\"")
+                    trecho = expressao[0:c]                        
+                    expressao = expressao[c:]
+                else:                    
+                    trecho = expressao[0:]
+                    expressao = ''
+                for palavra in trecho.split(): # Leitura do trecho. Checa e substitui as variáveis, checa a validade dos números, etc
+                    if palavra in self.variaveis.keys():
+                        palavra = self.variaveis[palavra]
+                        palavra = palavra.replace(',', '.') if palavra.replace(',', '.').isnumeric() else palavra
+                    elif palavra.replace(',','').isnumeric() and palavra.count(',') <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                 
+                        palavra = palavra.replace(",",".")  # Converte vírgula para ponto para poder ser lido nas operações.
+                    # Se não for variável, nem número, nem booleano e nem operação, dá erro.
+                    elif not any(palavra in operador.split() for operador in self.opcondicionais) and not any(palavra in operador.split() for operador in self.operações) and not palavra in self.booleanos: 
+                        dica = f'O termo "\033[1;31m{palavra}\033[0m" não parece estar sendo utilizado da maneira correta. Seria uma variável não declarada?'
+                        self.erro(f'Não é possível resolver "{''.join(trecho)}".', dica)
+                    elementos.append(palavra)
         return elementos
     
     def calcular(self, elementos):
         i = 0
         try:      
-            while 'vezes' in elementos or 'dividindo' in elementos:                                      
-                if elementos[i] == 'vezes' or elementos[i] == 'dividindo':
+            while 'vezes' in elementos or 'dividido' in elementos:                                      
+                if elementos[i] == 'vezes':
                     num1 = elementos[i - 1]
                     num1 = float(num1) if '.' in num1 else int(num1)
                     num2 = elementos[i + 1]
-                    num2 = float(num2) if '.' in num2 else int(num2)
-                    
-                    match elementos[i]:
-                        case 'vezes':                        
-                            resultado = num1 * num2
-                        case 'dividindo':
-                            resultado = num1 / num2
+                    num2 = float(num2) if '.' in num2 else int(num2)                      
+                    resultado = num1 * num2
                     elementos[i+1] = str(resultado)                   
                     elementos.pop(i - 1)                    
-                    elementos.pop(i - 1)                                        
+                    elementos.pop(i - 1)
+                
+                elif elementos[i] == 'dividido':
+                    if elementos[i + 1] != 'por':
+                        for c, palavra in enumerate(elementos):
+                            elementos[c] = palavra.replace('.', ',') if palavra.replace('.', '').isnumeric() else palavra
+                        dica = f'{' '.join(elementos[:i+1])} \033[1;32mpor\033[0m {' '.join(elementos[i+1:])}'
+                        self.erro('O termo "por" deve ser explicitado no operador "dividido por".', dica)
+                    
+                    num1 = elementos[i - 1]
+                    num1 = float(num1) if '.' in num1 else int(num1)
+                    num2 = elementos[i + 2]
+                    num2 = float(num2) if '.' in num2 else int(num2) 
+                    resultado = num1 / num2 
+                    elementos[i+2] = str(resultado)                   
+                    elementos = elementos[i+2:]
                 else:
                     i += 1 
             i = 0
@@ -106,18 +118,24 @@ class Monarca:
                 else:
                     i += 1
             i = 0
+            
+            # Operações Lógicas
             while any(operador in elementos for operador in ['igual', 'menor', 'maior', 'diferente']):
                 if elementos[i] == 'igual':
                     # Verificação de erros de sintaxe
                     if elementos[i - 1] != 'é':
+                        for c, palavra in enumerate(elementos):
+                            elementos[c] = palavra.replace('.', ',') if palavra.replace('.', '').isnumeric() else palavra
                         dica = f'{elementos[i-1]} \033[1;32mé\033[0m igual a {elementos[i+2] if elementos[i+1] == 'a' and len(elementos)>=elementos.index(elementos[i]) else elementos[i+1]}'
                         self.erro('O termo "é" deve ser explicitado na declaração lógica.', dica)
                     elif elementos[i+1] != 'a':
+                        for c, palavra in enumerate(elementos):
+                            elementos[c] = palavra.replace('.', ',') if palavra.replace('.', '').isnumeric() else palavra
                         dica = f'{elementos[i-2]} é igual\033[1;32m a\033[0m {elementos[i+1]}'
                         self.erro('O termo "a" deve ser explicitado ao usar o operador "igual a".', dica)    
                           
-                    num1 = float(elementos[i - 2].replace(',', '.')) if elementos[i - 2].replace(',', '').isnumeric() else elementos[i - 2]
-                    num2 = float(elementos[i + 2].replace(',', '.')) if elementos[i + 2].replace(',', '').isnumeric() else elementos[i + 2]
+                    num1 = float(elementos[i - 2]) if elementos[i - 2].replace('.', '').isnumeric() else elementos[i - 2]
+                    num2 = float(elementos[i + 2]) if elementos[i + 2].replace('.', '').isnumeric() else elementos[i + 2]
                     resultado = 'verdadeiro' if num1 == num2 else 'falso'
                     elementos[i+2] = str(resultado)
                     elementos = elementos[i+2:]
@@ -126,14 +144,18 @@ class Monarca:
                 elif elementos[i] == 'diferente':
                     # Verificação de erros de sintaxe
                     if elementos[i - 1] != 'é':
+                        for c, palavra in enumerate(elementos):
+                            elementos[c] = palavra.replace('.', ',') if palavra.replace('.', '').isnumeric() else palavra
                         dica = f'{elementos[i-1]} \033[1;32mé\033[0m diferente de {elementos[i+2] if elementos[i+1] == 'de' and len(elementos)>=elementos.index(elementos[i]) else elementos[i+1]}'
                         self.erro('O termo "é" deve ser explicitado na declaração lógica "diferente de".', dica)
                     elif elementos[i+1] != 'de':
+                        for c, palavra in enumerate(elementos):
+                            elementos[c] = palavra.replace('.', ',') if palavra.replace('.', '').isnumeric() else palavra
                         dica = f'{elementos[i-2]} é diferente\033[1;32m de\033[0m {elementos[i+1]}'
                         self.erro('O termo "de" deve ser explicitado ao usar o operador "diferente de".', dica)    
                     
-                    num1 = float(elementos[i - 2].replace(',', '.')) if elementos[i - 2].replace(',', '').isnumeric() else elementos[i - 2]
-                    num2 = float(elementos[i + 2].replace(',', '.')) if elementos[i + 2].replace(',', '').isnumeric() else elementos[i + 2]
+                    num1 = float(elementos[i - 2]) if elementos[i - 2].replace('.', '').isnumeric() else elementos[i - 2]
+                    num2 = float(elementos[i + 2]) if elementos[i + 2].replace('.', '').isnumeric() else elementos[i + 2]
                     resultado = 'verdadeiro' if num1 != num2 else 'falso'
                     elementos[i+2] = str(resultado)
                     elementos = elementos[i+2:]
@@ -147,12 +169,12 @@ class Monarca:
                     elif elementos[i+1] != 'que':
                         dica = f'{elementos[i-2]} é maior\033[1;32m que\033[0m {elementos[i+1]}'
                         self.erro('O termo "que" deve ser explicitado ao usar o operador "maior que".', dica)    
-                    elif not elementos[i-2].replace(',', '').isnumeric() or not elementos[i+2].replace(',', '').isnumeric():
+                    elif not elementos[i-2].replace('.', '').isnumeric() or not elementos[i+2].replace('.', '').isnumeric():
                         dica = f'{elementos[i-2] if elementos[i-2].isnumeric() else '\033[1;32m[número]\033[0m'} é maior que {elementos[i+2] if elementos[i+2].isnumeric() else '\033[1;32m[número]\033[0m'}'
                         self.erro('Dados numéricos devem ser explicitados ao utilizar o operador "maior que".', dica)
                     
-                    num1 = float(elementos[i - 2].replace(',', '.'))
-                    num2 = float(elementos[i + 2].replace(',', '.'))
+                    num1 = float(elementos[i - 2])
+                    num2 = float(elementos[i + 2])
                     resultado = 'verdadeiro' if num1 > num2 else 'falso'
                     elementos[i+2] = str(resultado)
                     elementos = elementos[i+2:]
@@ -166,12 +188,12 @@ class Monarca:
                     elif elementos[i+1] != 'que':
                         dica = f'{elementos[i-2]} é menor\033[1;32m que\033[0m {elementos[i+1]}'
                         self.erro('O termo "que" deve ser explicitado ao usar o operador "menor que".', dica)    
-                    elif not elementos[i-2].replace(',', '').isnumeric() or not elementos[i+2].replace(',', '').isnumeric():
+                    elif not elementos[i-2].replace('.', '').isnumeric() or not elementos[i+2].replace('.', '').isnumeric():
                         dica = f'{elementos[i-2] if elementos[i-2].isnumeric() else '\033[1;32m[número]\033[0m'} é menor que {elementos[i+2] if elementos[i+2].isnumeric() else '\033[1;32m[número]\033[0m'}'
                         self.erro('Dados numéricos devem ser explicitados ao utilizar o operador "menor que".', dica)
                     
-                    num1 = float(elementos[i - 2].replace(',', '.'))
-                    num2 = float(elementos[i + 2].replace(',', '.'))
+                    num1 = float(elementos[i - 2])
+                    num2 = float(elementos[i + 2])
                     resultado = 'verdadeiro' if num1 < num2 else 'falso'
                     elementos[i+2] = str(resultado)
                     elementos = elementos[i+2:]
@@ -194,41 +216,29 @@ class Monarca:
             
         # Terceira etapa: tipagem e finalização. Nesse ponto, se a expressão não retornar uma lista com um único elemento, será tratada como uma string. 
         # Também será tratada como string se tiver um único elemento envolto em aspas.
-        # Converte ponto para vírgula
-        for i, palavra in enumerate(elementos):                
-            if palavra.replace('.','').isnumeric():
-                elementos[i] = elementos[i].replace(".",",")
+        # Só converte ponto para vírgula se for para exibição na tela
 
         if len(elementos) > 1 or elementos[0][0] == "\"":
             elementos = "\"" + ''.join(elementos).replace("\"",'') + "\""
             return elementos
         else:
-            i = elementos[0].find(".")              
+            i = elementos[0].find('.')              
             if i != -1 and elementos[0][i + 1] == 0:
                 return elementos[0][0:i]
             else:
-                return elementos[0]           
-
-    # Função usada pelo interpretador para entender automaticamente de que tipo são os dados escritos no código do usuário
-    def tipo_de_dado(self, dado=''):
-        # Verifica se é um inteiro
-        if dado.isnumeric():
-            return 'inteiro'
-        # Verifica se é um número real.
-        # Primeiro, se tiver um "." no dado, separa os dois lados do . em uma lista e verifica se ambos os lados são numéricos e não possuem nenhum caractere além de números.
-        # Desta forma, se o dado for "12.5" ele se tornará "[12, 5]" para facilitar a verificação, afim de evitar erros como tentar converter "abc.6" em um número real, o que seria absolutamente incorreto.
-        elif '.' in dado and (dado.split('.')[0].isnumeric() and dado.split('.')[1].isnumeric()):
-            return 'real'
-        # Aqui ficará a verificação que determinará se é uma expressão de lógica booleana: em desenvolvimento
-        # Caso o dado não seja de nenhum dos tipos anteriores, o interpretador o assume como texto
-        else:
-            return 'texto' 
+                return elementos[0]
 
     # Função análoga ao print
     def escrever(self, texto):
         if texto.strip() != '':
             texto = self.processar_expressao(texto)
             texto = texto[1:len(texto)-1] if texto[0] == "\"" else texto # O Monarca guarda valores de strings com aspas. Para imprimir, removem-se estas aspas.
+            texto = texto.split()
+            # Troca ponto (utilizado para cálculos) para vírgula na visualização
+            for i, palavra in enumerate(texto):
+                if palavra.replace('.', '').isnumeric():
+                    texto[i] = palavra.replace('.', ',')
+            texto = ' '.join(texto)
             print(texto)
         else:
             self.erro("Nenhum valor indicado para impressão na tela.")    
@@ -264,58 +274,3 @@ class Monarca:
                     indice += 1
             indice += 1
         return eval(''.join(expressão))  
-
-
-
-
-
-
-#  # Função de operações aritméticas. Analisa primeiramente os operadores de multiplicação e divisão, depois os de adição e subtração.
-#     def aritmetica(self, expressao):
-#         total = 0
-        
-#         # Continua rodando até que todos os operadores de multiplicação e divisão tenham sido substituídos pelos resultados numéricos de suas operações, para que só então as outras operações possam ser executadas.
-#         while 'vezes' in expressao or 'dividindo' in expressao:
-#             try:
-#                 if 'vezes' in expressao:
-#                     n1 = expressao[expressao.index('vezes') - 1]
-#                     n2 = expressao[expressao.index('vezes') + 1]
-#                     resultado = float(n1)*float(n2)
-#                     # Substitui a operação pelo resultado.
-#                     expressao[expressao.index('vezes')+1] = resultado
-#                     expressao.pop(expressao.index('vezes'))
-#                     expressao.pop(expressao.index(n1))
-#                     total = resultado
-#                 elif 'dividindo' in expressao:
-#                     n1 = expressao[expressao.index('dividindo') - 1]
-#                     n2 = expressao[expressao.index('dividindo') + 1]
-#                     resultado = float(n1)/float(n2)
-#                     # Substitui a operação pelo resultado
-#                     expressao[expressao.index('dividindo')+1] = resultado
-#                     expressao.pop(expressao.index('dividindo'))
-#                     expressao.pop(expressao.index(n1))
-#                     total = resultado
-    
-#             except Exception:
-#                 self.erro(f'Expressão aritmética mal formulada.')
-
-#         try:
-#             for c in range(0, len(expressao)):
-#                 if expressao[c] == 'mais':
-#                     if c == 1:
-#                         total = float(expressao[c-1]) + float(expressao[c+1])
-#                         c += 1
-#                     else:
-#                         total += float(expressao[c+1])
-
-#                 elif expressao[c] == 'menos':
-#                     if c == 1: 
-#                         total = float(expressao[c-1]) - float(expressao[c+1])
-#                         c += 1
-#                     else:
-#                         total -= float(expressao[c+1])
-                                        
-#             return total
-
-#         except Exception:
-#             self.erro(f'Expressão aritmética mal formulada.')
