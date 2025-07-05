@@ -7,6 +7,6 @@
 ::info mostrar na tela: "Eu sou uma linguagem de programação de alto nível, nomeada " nome "!"
 ::info mostrar na tela: "Eu tenho apenas " idade " semanas de idade"
 ::info mostrar na tela: nome
-variável n recebe 9
-variável m recebe 5,9
-mostrar na tela: n é menor que m é igual a falso
+variável n recebe 5
+variável m recebe 50
+mostrar na tela: n vezes 10 é igual a m

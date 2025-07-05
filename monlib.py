@@ -62,7 +62,8 @@ class Monarca:
                             palavra = self.variaveis[palavra]
                         elif palavra.replace(',','').isnumeric() and palavra.count(",") <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                 
                             palavra = palavra.replace(",",".")  # Converte vírgula para ponto para poder ser lido nas operações.
-                        elif not any(palavra in operador.split() for operador in self.opcondicionais) and not palavra in self.booleanos: # Se não for variável, nem número, nem booleano e nem operação, dá erro.
+                        elif not any(palavra in operador.split() for operador in self.opcondicionais) and not palavra in self.operações and not palavra in self.booleanos: # Se não for variável, nem número, nem booleano e nem operação, dá erro.
+                            print(palavra)
                             self.erro(f'Não é possível resolver "{''.join(trecho)}".')
                         elementos.append(palavra)
         return elementos
@@ -180,7 +181,6 @@ class Monarca:
                     i += 1
             return elementos
         except Exception as e:
-            print(e)
             self.erro(f'Não é possível resolver "{' '.join(elementos)}".')
 
     def processar_expressao(self, expressao):
