@@ -66,7 +66,7 @@ class Monarca:
                     elif palavra.replace(',','').isnumeric() and palavra.count(',') <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                 
                         palavra = palavra.replace(",",".")  # Converte vírgula para ponto para poder ser lido nas operações.
                     # Se não for variável, nem número, nem booleano e nem operação, dá erro.
-                    elif not any(palavra in operador.split() for operador in self.opcondicionais) and not any(palavra in operador.split() for operador in self.operações) and not palavra in self.booleanos and not '\n': 
+                    elif not any(palavra in operador.split() for operador in self.opcondicionais) and not any(palavra in operador.split() for operador in self.operações) and not palavra in self.booleanos and palavra != '\n': 
                         dica = f'O termo "\033[1;31m{palavra}\033[0m" não parece estar sendo utilizado da maneira correta. Seria uma variável não declarada?'
                         self.erro(f'Não é possível resolver "{''.join(trecho)}".', dica)
                     elementos.append(palavra)
@@ -276,7 +276,7 @@ class Monarca:
             self.variaveis.update({nome : var})
         elif operacao == 'input':
             if var is None:
-                var = input()
+                var = input('> ')
             else:
                 var = input(f"{var}: ")
             self.variaveis.update({nome : var})
