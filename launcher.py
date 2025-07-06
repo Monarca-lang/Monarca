@@ -151,10 +151,11 @@ def executar_script(arquivo):
 
     terminal_output.delete("1.0", "end")
 
-    main_exe_path = os.path.join(BASE_DIR, "main.exe")
+    main_py_path = os.path.join(BASE_DIR, "main.py")
+    arg_arquivo = os.path.basename(arquivo)
 
     processo = subprocess.Popen(
-        [main_exe_path, "-s", os.path.abspath(arquivo)],
+        [sys.executable, main_py_path, "-s", arg_arquivo],
         cwd=BASE_DIR,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,

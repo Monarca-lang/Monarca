@@ -1,4 +1,3 @@
-
 mostrar na tela: "Olá, mundo!"
 variável nome recebe "Monarca"
 variável idade recebe "cara eu genuinamente nao lembro quanto tempo"
@@ -17,4 +16,4 @@ variável acompanhou recebe entrada: Conseguiu acompanhar?
 se acompanhou é igual a Não ou acompanhou é igual a não então:
     mostrar na tela: "ai eh foda.."
 se acompanhou é igual a Sim ou acompanhou é igual a sim então:
-    mostrar na tela: "dale porra vambora"
+    mostrar na tela: "dale porra" \n "vambora"
