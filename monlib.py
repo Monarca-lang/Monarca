@@ -7,7 +7,8 @@ class Monarca:
             'mostrar',
             'variável',
             'deletar',
-            'se'
+            'se',
+            'senão',
         )
         self.operações = (
             'mais',
@@ -252,23 +253,32 @@ class Monarca:
 
     # Função análoga ao print
     def escrever(self, texto):
-        if texto.strip() != '':
-            texto = self.processar_expressao(texto)
-            texto = texto[1:len(texto)-1] if texto[0] == "\"" else texto # O Monarca guarda valores de strings com aspas. Para imprimir, removem-se estas aspas.
-            texto = texto.replace('\\n', '\n') # Substitui \n por uma quebra de linha
-            
-            linhas = texto.split('\n') # Divide o texto em linhas (espero não ter quebrado nada com isso..)
-            for idx, linha in enumerate(linhas):
-                palavras = linha.split()
-                for i, palavra in enumerate(palavras):
-                    if palavra.replace('.', '').isnumeric():
-                        palavras[i] = palavra.replace('.', ',')
-                linhas[idx] = ' '.join(palavras)
-            texto = '\n'.join(linhas)
-
-            print(texto)
-        else:
-            self.erro("Nenhum valor indicado para impressão na tela.")    
+            if texto.strip() != '':
+                texto = self.processar_expressao(texto)
+                # O Monarca guarda valores de strings com aspas. Para imprimir, removem-se estas aspas.
+                if texto.startswith("\"") and texto.endswith("\""):
+                    texto = texto[1:-1]
+                
+                # Substitui \n por uma quebra de linha
+                texto = texto.replace('\\n', '\n')
+                
+                linhas_processadas = []
+                # Divide o texto em linhas
+                for linha in texto.split('\n'):
+                    palavras_processadas = []
+                    for palavra in linha.split(' '):
+                        palavra_sem_pontuacao = palavra.rstrip('.,!?;:')
+                        pontuacao = palavra[len(palavra_sem_pontuacao):]
+                        
+                        if palavra_sem_pontuacao.replace('.', '').isnumeric():
+                            palavras_processadas.append(palavra_sem_pontuacao.replace('.', ',') + pontuacao)
+                        else:
+                            palavras_processadas.append(palavra)
+                    linhas_processadas.append(' '.join(palavras_processadas))
+                
+                print('\n'.join(linhas_processadas))
+            else:
+                self.erro("Nenhum valor indicado para impressão na tela.")
 
     # Função para inicializar ou deletar variáveis
     def variavel(self, operacao='', nome='', var=None):
@@ -276,7 +286,7 @@ class Monarca:
             self.variaveis.update({nome : var})
         elif operacao == 'input':
             if var is None:
-                var = input('> ')
+                var = input()
             else:
                 var = input(f"{var}: ")
             self.variaveis.update({nome : var})
