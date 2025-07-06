@@ -255,12 +255,15 @@ class Monarca:
     def escrever(self, texto):
             if texto.strip() != '':
                 texto = self.processar_expressao(texto)
+                # O Monarca guarda valores de strings com aspas. Para imprimir, removem-se estas aspas.
                 if texto.startswith("\"") and texto.endswith("\""):
                     texto = texto[1:-1]
                 
+                # Substitui \n por uma quebra de linha
                 texto = texto.replace('\\n', '\n')
                 
                 linhas_processadas = []
+                # Divide o texto em linhas
                 for linha in texto.split('\n'):
                     palavras_processadas = []
                     for palavra in linha.split(' '):
