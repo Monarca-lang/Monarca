@@ -247,6 +247,8 @@ class Monarca:
     def variavel(self, operacao='', nome='', var=None):
         if operacao == 'add':
             self.variaveis.update({nome : var})
+        elif operacao == 'input':
+            pass
         elif operacao == 'del':
             if nome in self.variaveis.keys():
                 self.variaveis.pop(nome)

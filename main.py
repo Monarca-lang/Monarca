@@ -71,10 +71,19 @@ for c, linha in enumerate(script):
                 dica = f'variável {dlinha[1]} recebe \033[1;32m[valor de sua escolha]\033[0m'
                 monarca.erro(f'Um valor deve ser definido para a variável.', dica)
             else:
-                # Envia tudo o que vier depois de "recebe" para ser processado.
-                valor = ' '.join(dlinha[3:])
-                valor = monarca.processar_expressao(expressao=valor)
-                monarca.variavel(operacao='add', nome=dlinha[1], var=valor)
+                if dlinha[3] == 'entrada:':
+                    # Tratamento especial para receber entrada do usuário
+                    if len(dlinha) != 4:
+                        # Verifica se o usuário quer apresentar um texto ao pedir a entrada:
+                        monarca.variavel(operacao='input', nome=dlinha[1], var=' '.join(dlinha[4:]))
+                    else:
+                        # Se não, vai no seco
+                        monarca.variavel(operacao='input', nome=dlinha[1])
+                else:
+                    # Envia tudo o que vier depois de "recebe" para ser processado.
+                    valor = ' '.join(dlinha[3:])
+                    valor = monarca.processar_expressao(expressao=valor)
+                    monarca.variavel(operacao='add', nome=dlinha[1], var=valor)
                 
         # Verifica se o usuário quer deletar uma variável
         elif dlinha[0] == 'deletar':
