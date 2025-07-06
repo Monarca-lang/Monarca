@@ -4,7 +4,7 @@
 from time import time
 tempo_inicial = time()
 
-from Levenshtein import distance # type: ignore
+from Levenshtein import distance
 from argparse import ArgumentParser
 from monlib import Monarca
 
