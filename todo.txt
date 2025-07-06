@@ -2,7 +2,7 @@
 * CORRIGIR BUGS!
 * Implementar operações lógicas (booleanas) - Feito parcialmente
 * Implementar conversão de tipos
-* Implementar desvios condicionais
+* Implementar desvios condicionais (fiz else mas nâo funciona aninhado - Ryan)
 * Implementar laços de repetição
 * Implementar definição de funções
 * Implementar funções built-in (len, replace etc)
