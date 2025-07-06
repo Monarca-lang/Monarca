@@ -7,7 +7,8 @@ class Monarca:
             'mostrar',
             'variável',
             'deletar',
-            'se'
+            'se',
+            'senão',
         )
         self.operações = (
             'mais',
