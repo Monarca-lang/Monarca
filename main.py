@@ -1,8 +1,10 @@
+#RYAN: quero implementar o 'senão' como uma flag pra isso, vou precisar contar os espaços de identação e utilizar flag
+
 # Controle do tempo de execução do programa. No final do código tem um trecho que termina de calcular o tempo e imprime o resultado.
 from time import time
 tempo_inicial = time()
 
-from Levenshtein import distance
+from Levenshtein import distance # type: ignore
 from argparse import ArgumentParser
 from monlib import Monarca
 
@@ -24,25 +26,24 @@ except Exception:
 for c, linha in enumerate(script):
     linha = linha.replace('\n', '') # Impede que a quebra de linha atrapalhe a leitura dos dados
 
-    # Todo esse bloco serve para checar a identação e saber quais linhas ler dependendo do bloco "se".
-    numEspaços = 0
-    for caractere in linha:  # Esse loop serve pra identificar a identação da linha
-        if caractere != ' ':
-            break
-        numEspaços += 1
+    # Conta os espaços no início da linha para ver a identação [linha com espaço - sem (strippada)]
+    numEspaços = len(linha) - len(linha.lstrip(' '))
     if numEspaços % 4 != 0:  # Esse valor 4 é porque 1 TAB equivale a 4 espaços em Python. Se o programador colocar uma identação estranha, vai dar erro.
-        monarca.erro('Erro de identação. Consulte a documentação.')  
-    numEspaços /= 4
-    if numEspaços > monarca.chaveSE[0]:
-        if monarca.chaveSE[1] == False:
-            continue
+        monarca.erro('Erro de identação. Consulte a documentação.')
+    # Pega nível da identação 
+    nivel_identacao = numEspaços // 4   
+    # Se identação menor que nível da chave, reseta a flag
+    if nivel_identacao < monarca.chaveSE[0]:
+        monarca.chaveSE[0] = 0
+        monarca.chaveSE[1] = True
+    # Se a flag manda pular a linha, pula.
+    if nivel_identacao == monarca.chaveSE[0] and not monarca.chaveSE[1]:
+        # Se for um else, não pula
+        if linha.lstrip().startswith('senão'):
+            pass
         else:
-            monarca.erro('Erro de identação. Consulte a documentação.')    
-    elif numEspaços == monarca.chaveSE[0] and monarca.chaveSE[1] == False:
-        continue
-    elif numEspaços < monarca.chaveSE[0]:
-        monarca.chaveSE[0] = numEspaços
-        monarca.chaveSE[1] = True   
+            continue
+
 
     if '::info' in linha:   # Ignora comentários
         índice = linha.find('::info')
@@ -102,17 +103,29 @@ for c, linha in enumerate(script):
                 monarca.erro(f'A palavra "tela:" deve ser explicitada no comando "mostrar na tela".', dica)
             else:
                 monarca.escrever(texto=linha[17:])
-        elif dlinha[0] == 'se':
-            if dlinha[-1] != 'então:':
-                dica = f'se [condição] \033[1;32mentão:\033[0m' # 
+        elif dlinha[0] == 'se': 
+            if dlinha[-1] != 'então:': #termina sem 'então:'
+                dica = f'se [condição] \033[1;32mentão:\033[0m' 
                 monarca.erro(f'A palavra "então:" deve ser explicitada no comando "se [condição] então:".', dica)
             else:
-                monarca.chaveSE[0] += 1
                 valor = ' '.join(dlinha[1:len(dlinha)-1])
                 valor = monarca.processar_expressao(expressao=valor)
-                if valor == 'falso' or (valor.isnumeric() and int(valor) == 0):
-                    monarca.chaveSE[1] = False
-    # Entrega um erro e uma sugestão de correção caso o comando não esteja previsto na documentação. 
+                cond_true = not(valor == 'falso' or (valor.isnumeric() and int(valor) == 0))
+                # Se condiçao  true, executa (muda a flag)
+                monarca.chaveSE = [nivel_identacao + 1, cond_true]
+                continue
+        elif dlinha[0] == 'senão':
+            if dlinha[-1] != 'então:':
+                dica = f'senão \033[1;32mentão:\033[0m'
+                monarca.erro(f'A palavra "então:" deve ser explicitada no comando "senão então:".', dica)
+            if nivel_identacao != monarca.chaveSE[0] - 1:
+                monarca.erro('Comando "senão" com indentação incorreta.')
+            #Se a flag de condição for verdadeira, pula a linha
+            monarca.chaveSE[1] = not monarca.chaveSE[1]
+            continue
+
+
+    # Entrega um erro e uma sugestão de correção casoo o comando não esteja previsto na documentação. 
     else:
         distancias = [distance(dlinha[0], palavra) for palavra in monarca.palavras_reservadas]
         chute = monarca.palavras_reservadas[distancias.index(min(distancias))]
