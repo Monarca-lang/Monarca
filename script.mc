@@ -18,3 +18,10 @@ se acompanhou é igual a Não ou acompanhou é igual a não então:
     mostrar na tela: "ai eh foda.."
 se acompanhou é igual a Sim ou acompanhou é igual a sim então:
     mostrar na tela: "dale porra vambora"
+::info testando senão
+se numero dividido por 2 é igual a 0 então:
+    mostrar na tela: "O número " numero " é par."
+senão então:
+    mostrar na tela: "O número " numero " é ímpar."
+mostrar na tela: "--Suporte ao recebimento de entradas pelo usuário!--"
+variável acompanhou recebe entrada: Conseguiu acompanhar? (Sim/Não)
