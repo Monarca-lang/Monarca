@@ -1,4 +1,4 @@
-# RYAn: quero implementar o 'senão' como uma flag pra isso, vou precisar contar os espaços de identação
+# Ryan: implementando o 'senão' como uma flag pra isso, vou precisar contar os espaços de identação
 
 # Controle do tempo de execução do programa. No final do código tem um trecho que termina de calcular o tempo e imprime o resultado.
 from time import time
@@ -31,7 +31,7 @@ for c, linha in enumerate(script):
         índice = linha_original.find('::info')
         linha_original = linha_original[:índice]
     
-    # Ignora linhas vazias
+    # Checa se é uma linha vazia. Se sim, apenas pula para a próxima.
     if linha_original.strip() == '':
         continue
 
@@ -41,13 +41,13 @@ for c, linha in enumerate(script):
         monarca.erro('Erro de identação. Consulte a documentação.')
     
     nivel_identacao = numEspaços // 4
-    monarca.linha = c # Informa o index da linha para o Monarca
+    # Informa o index da linha para o Monarca, a fim de apontar onde ocorreu algum eventual erro.
+    monarca.linha = c 
     
     linha_processada = linha_original.lstrip()
-    dlinha = linha_processada.split(' ')
+    dlinha = linha_processada.split(' ') # Lista que contém a linha dividida em palavras.
 
-    # Lógica de controle para SE/SENÃO
-    # Se for um comando "senão"
+    # Aplicando else
     if dlinha[0] == 'senão':
         if dlinha[-1] != 'então:':
             dica = f'senão \033[1;32mentão:\033[0m'
@@ -55,11 +55,11 @@ for c, linha in enumerate(script):
         if nivel_identacao != monarca.chaveSE[0] - 1:
             monarca.erro('Comando "senão" com indentação incorreta.')
         
-        # Inverte a condição do "se" anterior para decidir se executa o "senão"
+        # Inverte o "se" anterior para decidir se executa o "senão"
         monarca.chaveSE[1] = not monarca.chaveSE[1]
-        continue # Pula para a próxima linha após processar o "senão"
+        continue
 
-    # Se a indentação diminuiu, e não estamos num "senão", o bloco anterior terminou.
+    # Se a indentação diminuiu o bloco anterior terminou.
     if nivel_identacao < monarca.chaveSE[0]:
         monarca.chaveSE = [0, True]
 
@@ -115,6 +115,7 @@ for c, linha in enumerate(script):
                 monarca.chaveSE = [nivel_identacao + 1, cond_true]
                 continue
     
+    # Entrega um erro e uma sugestão de correção caso o comando não esteja previsto na documentação.
     else:
         distancias = [distance(dlinha[0], palavra) for palavra in monarca.palavras_reservadas]
         chute = monarca.palavras_reservadas[distancias.index(min(distancias))]
