@@ -23,5 +23,3 @@ se numero dividido por 2 é igual a 0 então:
     mostrar na tela: "O número " numero " é par."
 senão então:
     mostrar na tela: "O número " numero " é ímpar."
-mostrar na tela: "--Suporte ao recebimento de entradas pelo usuário!--"
-variável acompanhou recebe entrada: Conseguiu acompanhar? (Sim/Não)
