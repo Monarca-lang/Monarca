@@ -124,7 +124,8 @@ for c, linha in enumerate(script):
             dica = f'\033[1;32mdeletar\033[0m variável [variável de sua escolha]'
         elif chute == 'se':
             dica = f'\033[1;32mse\033[0m [condição] então:'
-        
+        elif chute == 'entrada':
+            dica = f'\033[1;32mentrada\033[0m [nome] [mensagem opcional]'
         monarca.erro(f'Comando "{dlinha[0]}" não encontrado. Consulte a documentação.', dica)   
         
 tempo_final = time()

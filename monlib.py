@@ -14,7 +14,9 @@ class Monarca:
             'menos',
             'vezes',
             'dividido por',
-            'igual'
+            'igual',
+            'ou',
+            'e'
         )
         self.opcondicionais = {
             'é igual a',
@@ -64,7 +66,7 @@ class Monarca:
                     elif palavra.replace(',','').isnumeric() and palavra.count(',') <= 1: # Se o trecho for apenas números e vírgula e, havendo vírgula, houver apenas uma.                 
                         palavra = palavra.replace(",",".")  # Converte vírgula para ponto para poder ser lido nas operações.
                     # Se não for variável, nem número, nem booleano e nem operação, dá erro.
-                    elif not any(palavra in operador.split() for operador in self.opcondicionais) and not any(palavra in operador.split() for operador in self.operações) and not palavra in self.booleanos: 
+                    elif not any(palavra in operador.split() for operador in self.opcondicionais) and not any(palavra in operador.split() for operador in self.operações) and not palavra in self.booleanos and not '\n': 
                         dica = f'O termo "\033[1;31m{palavra}\033[0m" não parece estar sendo utilizado da maneira correta. Seria uma variável não declarada?'
                         self.erro(f'Não é possível resolver "{''.join(trecho)}".', dica)
                     elementos.append(palavra)
@@ -201,6 +203,26 @@ class Monarca:
                 
                 else:
                     i += 1
+            
+            # Operadores lógicos "ou" e "e"
+            i = 0
+            while 'ou' in elementos or 'e' in elementos:
+                if elementos[i] == 'ou' or elementos[i] == 'e':
+                    val1 = elementos[i - 1]
+                    val2 = elementos[i + 1]
+                    # Converta para booleano Monarca
+                    bool1 = (val1 == 'verdadeiro' or val1 == 'True' or val1 == '1')
+                    bool2 = (val2 == 'verdadeiro' or val2 == 'True' or val2 == '1')
+                    if elementos[i] == 'ou':
+                        resultado = 'verdadeiro' if (bool1 or bool2) else 'falso'
+                    else:  # 'e'
+                        resultado = 'verdadeiro' if (bool1 and bool2) else 'falso'
+                    elementos[i+1] = resultado
+                    elementos.pop(i - 1)
+                    elementos.pop(i - 1)
+                    i = 0
+                else:
+                    i += 1
             return elementos
         except Exception as e:
             self.erro(f'Não é possível resolver "{' '.join(elementos)}".')
@@ -233,12 +255,17 @@ class Monarca:
         if texto.strip() != '':
             texto = self.processar_expressao(texto)
             texto = texto[1:len(texto)-1] if texto[0] == "\"" else texto # O Monarca guarda valores de strings com aspas. Para imprimir, removem-se estas aspas.
-            texto = texto.split()
-            # Troca ponto (utilizado para cálculos) para vírgula na visualização
-            for i, palavra in enumerate(texto):
-                if palavra.replace('.', '').isnumeric():
-                    texto[i] = palavra.replace('.', ',')
-            texto = ' '.join(texto)
+            texto = texto.replace('\\n', '\n') # Substitui \n por uma quebra de linha
+            
+            linhas = texto.split('\n') # Divide o texto em linhas (espero não ter quebrado nada com isso..)
+            for idx, linha in enumerate(linhas):
+                palavras = linha.split()
+                for i, palavra in enumerate(palavras):
+                    if palavra.replace('.', '').isnumeric():
+                        palavras[i] = palavra.replace('.', ',')
+                linhas[idx] = ' '.join(palavras)
+            texto = '\n'.join(linhas)
+
             print(texto)
         else:
             self.erro("Nenhum valor indicado para impressão na tela.")    
@@ -248,7 +275,11 @@ class Monarca:
         if operacao == 'add':
             self.variaveis.update({nome : var})
         elif operacao == 'input':
-            pass
+            if var is None:
+                var = input()
+            else:
+                var = input(f"{var}: ")
+            self.variaveis.update({nome : var})
         elif operacao == 'del':
             if nome in self.variaveis.keys():
                 self.variaveis.pop(nome)
