@@ -19,7 +19,9 @@ se acompanhou é igual a Não ou acompanhou é igual a não então:
 se acompanhou é igual a Sim ou acompanhou é igual a sim então:
     mostrar na tela: "dale porra vambora"
 ::info testando senão
-se numero dividido por 2 é igual a 0 então:
-    mostrar na tela: "O número " numero " é par."
+variável else recebe Não
+mostrar na tela: "debug"
+se else é igual a Sim:
+    mostrar na tela: "DUE RUIM"
 senão então:
-    mostrar na tela: "O número " numero " é ímpar."
+    mostrar na tela: "OPA"
