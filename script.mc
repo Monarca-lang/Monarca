@@ -1,3 +1,4 @@
+
 mostrar na tela: "Olá, mundo!"
 variável nome recebe "Monarca"
 variável idade recebe "cara eu genuinamente nao lembro quanto tempo"
@@ -12,8 +13,14 @@ mostrar na tela: "--Suporte a comentários no código, que não passam pelas che
 ::info isso é um comentário!
 mostrar na tela: "--Bifurcações condicionais--"
 mostrar na tela: "--Suporte ao recebimento de entradas pelo usuário!--" ::info recebimento é o termo certo?
-variável acompanhou recebe entrada: Conseguiu acompanhar?
-se acompanhou é igual a Não ou acompanhou é igual a não então:
-    mostrar na tela: "ai eh foda.."
-se acompanhou é igual a Sim ou acompanhou é igual a sim então:
-    mostrar na tela: "dale porra" \n "vambora"
+::info testando senão
+variável idade recebe 18
+se idade é maior que 18 então:
+    mostrar na tela: "Maior de idade."
+senão então:
+    mostrar na tela: "Menor de idade ou tem 18 anos."
+
+se 10 é igual a 10 então:
+    mostrar na tela: "Dez é igual a dez!"
+senão então:
+    mostrar na tela: "Isso nunca deveria ser impresso."
