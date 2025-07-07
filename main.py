@@ -4,7 +4,7 @@ tempo_inicial = time()
 
 from Levenshtein import distance
 from argparse import ArgumentParser
-from monlib import Monarca # Garanta que monlib.py esteja atualizado
+from monlib import Monarca 
 
 # Define o argumento "-s" ou "--script" para usuários de linha de comando apontarem onde está o script que desejam executar.
 argumentos = ArgumentParser(usage='monarca.py -s script.mc')
@@ -20,7 +20,7 @@ try:
 except Exception:
     monarca.erro(f'Arquivo {argumentos.script} não encontrado.')
 
-# A variável c é o índice da linha. O laço for foi trocado por while para permitir o controle do fluxo de execução.
+# A variável c é o índice da linha, e a variável linha contém o texto da linha em si. A cada laço é interpretada uma linha do script.
 c = 0
 while c < len(script):
     linha = script[c]
@@ -31,7 +31,6 @@ while c < len(script):
     if '::info' in linha_original:
         índice = linha_original.find('::info')
         linha_original = linha_original[:índice]
-
     # Checa se é uma linha vazia. Se sim, apenas pula para a próxima.
     if linha_original.strip() == '':
         c += 1
@@ -39,9 +38,8 @@ while c < len(script):
 
     # Conta os espaços no início da linha para ver a identação
     numEspaços = len(linha_original) - len(linha_original.lstrip())
-    if numEspaços % 4 != 0:
+    if numEspaços % 4 != 0: # Esse valor 4 é porque 1 TAB equivale a 4 espaços em Python.
         monarca.erro('Erro de identação. Consulte a documentação.')
-
     nivel_identacao = numEspaços // 4
     linha_processada = linha_original.lstrip()
     dlinha = linha_processada.split(' ')
@@ -99,21 +97,19 @@ while c < len(script):
                     valor = ' '.join(dlinha[3:])
                     valor = monarca.processar_expressao(expressao=valor)
                     monarca.variavel(operacao='add', nome=dlinha[1], var=valor)
-
         elif dlinha[0] == 'deletar':
             if len(dlinha) < 3 or dlinha[1] != 'variável':
                 dica = f'deletar \033[1;32mvariável\033[0m [nome]'
                 monarca.erro('Sintaxe incorreta. Use "deletar variável [nome]".', dica)
             else:
                 monarca.variavel('del', dlinha[2])
-
         elif dlinha[0] == 'mostrar':
             if len(dlinha) < 3 or ' '.join(dlinha[1:3]) != 'na tela:':
                  dica = f'mostrar \033[1;32mna tela:\033[0m [valor]'
                  monarca.erro('Sintaxe incorreta. Use "mostrar na tela: [valor]".', dica)
             else:
                 monarca.escrever(texto=linha_processada[17:])
-
+        
         elif dlinha[0] == 'se':
             if dlinha[-1] != 'então:':
                 dica = f'se [condição] \033[1;32mentão:\033[0m'
@@ -123,7 +119,6 @@ while c < len(script):
                 valor = monarca.processar_expressao(expressao=valor)
                 cond_true = not (valor == 'falso' or (valor.replace('.', '').isnumeric() and float(valor) == 0))
                 monarca.pilha_se.append([nivel_identacao + 1, cond_true])
-
         elif dlinha[0] == 'para':
             if len(dlinha) != 4 or ' '.join(dlinha[1:3]) != 'contando até' or not dlinha[3].endswith(':'):
                 dica = 'para contando até [número]:'
@@ -146,6 +141,5 @@ while c < len(script):
         monarca.erro(f'Comando "{dlinha[0]}" não encontrado. Consulte a documentação.', dica)
 
     c += 1
-
 tempo_final = time()
 print(f'\n\033[1;33mTempo de execução: {tempo_final - tempo_inicial:.4f} segundos.\033[m')
