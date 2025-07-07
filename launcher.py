@@ -9,7 +9,6 @@ import threading
 import webbrowser
 import json
 import random
-
 # Inicialização do Pygame para áudio
 try:
     import pygame
@@ -223,8 +222,10 @@ def enviar_input(event=None):
         elif input_easteregg == "cyberpunk":
             play_easter_egg("cyberpunk")
             terminal_output.insert("end", "Wake the fuck up, Samurai.\nWe got a city to burn.\n")
+        elif input_easteregg == "make me a sandwich":
+            terminal_output.insert("end", "What? Make it yourself.\n")
         elif input_easteregg == "sudo make me a sandwich":
-            terminal_output.insert("end", "Okay. 🥪 Feito. Mas só dessa vez.\n")
+            terminal_output.insert("end", "Okay.")
         elif input_easteregg == "42":
             terminal_output.insert("end", "Resposta para a Vida, o Universo e Tudo Mais.\n")
         elif input_easteregg == "big smoke":
@@ -237,7 +238,7 @@ def enviar_input(event=None):
             terminal_output.insert("end", "Shrek é vida.\n")
         elif input_easteregg == "cavalo":
             play_easter_egg("vacalo")
-        elif input_easteregg == "interagir":
+        elif input_easteregg == "interagir" or input_easteregg == "z" or input_easteregg == "undertale":
             terminal_output.insert("end", "Interagir com o terminal te enche de determinação.\n")
             play_easter_egg("undertale")
         elif input_easteregg == "draven":
@@ -260,49 +261,51 @@ def enviar_input(event=None):
             ppt('papel')
         elif input_easteregg == "tesoura":
             ppt('tesoura')
-        elif input_easteregg in ["limpar", "cls"]:
+        elif input_easteregg in ["limpar", "clr", "clear"]:
             terminal_output.delete("1.0", "end")
         elif input_easteregg == "ajuda" or input_easteregg == "help" or input_easteregg == "comandos":
             terminal_output.insert("end", "Comandos disponíveis:\n")
             terminal_output.insert("end", "- tutorial: Inicia o tutorial interativo.\n")
-            terminal_output.insert("end", "- limpar/cls: Limpa o terminal.\n")
+            terminal_output.insert("end", "- limpar/clr/clear: Limpa o terminal.\n")
             terminal_output.insert("end", "- docs: Abre a documentação do Monarca.\n")
+            terminal_output.insert("end", "- *frase secreta*: lista todos os easter eggs, apenas os alunos mais perspicazes de Koiller\nsaberão qual frase é.\n")
         elif input_easteregg == "docs":
             abrir_documentacao()
         elif input_easteregg == "totó é um mamífero":
             terminal_output.insert("end", "lista de easter eggs:\n")
-            terminal_output.insert("end", "- arthur morgan\n")
-            terminal_output.insert("end", "- iddqd\n")
-            terminal_output.insert("end", "- up up down down left right left right b a\n")
-            terminal_output.insert("end", "- bolo/cake\n")
-            terminal_output.insert("end", "- fus ro dah\n")
-            terminal_output.insert("end", "- i need healing\n")
-            terminal_output.insert("end", "- minecraft\n")
-            terminal_output.insert("end", "- sus\n")
-            terminal_output.insert("end", "- nmap -sS 127.0.0.1\n")
-            terminal_output.insert("end", "- sudo rm -rf\n")
-            terminal_output.insert("end", "- telnet towel.blinkenlights.nl\n")
-            terminal_output.insert("end", "- hello world\n")
-            terminal_output.insert("end", "- roll d20\n")
-            terminal_output.insert("end", "- cast fireball\n")
-            terminal_output.insert("end", "- whoami\n")
-            terminal_output.insert("end", "- help me\n")
-            terminal_output.insert("end", "- rickroll\n")
-            terminal_output.insert("end", "- start game\n")
-            terminal_output.insert("end", "- hogwarts\n")
-            terminal_output.insert("end", "- this is what you asked for\n")
-            terminal_output.insert("end", "- cyberpunk\n")
-            terminal_output.insert("end", "- sudo make me a sandwich\n")
-            terminal_output.insert("end", "- 42\n")
-            terminal_output.insert("end", "- big smoke\n")
-            terminal_output.insert("end", "- hesoyam\n")
-            terminal_output.insert("end", "- shrek is love\n")
-            terminal_output.insert("end", "- cavalo\n")
-            terminal_output.insert("end", "- interagir\n")
-            terminal_output.insert("end", "- draven\n")
-            terminal_output.insert("end", "- akali\n")
-            terminal_output.insert("end", "- zomboid/project zomboid\n")
-            terminal_output.insert("end", "- pedra/papel/tesoura\n")
+            terminal_output.insert("end", "1 - arthur morgan\n")
+            terminal_output.insert("end", "2 - iddqd\n")
+            terminal_output.insert("end", "3 - up up down down left right left right b a\n")
+            terminal_output.insert("end", "4 - bolo/cake\n")
+            terminal_output.insert("end", "5 - fus ro dah\n")
+            terminal_output.insert("end", "6 - i need healing\n")
+            terminal_output.insert("end", "7 - minecraft\n")
+            terminal_output.insert("end", "8 - sus\n")
+            terminal_output.insert("end", "9 - nmap -sS 127.0.0.1\n")
+            terminal_output.insert("end", "10 - sudo rm -rf\n")
+            terminal_output.insert("end", "11 - telnet towel.blinkenlights.nl\n")
+            terminal_output.insert("end", "12 - hello world\n")
+            terminal_output.insert("end", "13 - roll d20\n")
+            terminal_output.insert("end", "14 - cast fireball\n")
+            terminal_output.insert("end", "15 - whoami\n")
+            terminal_output.insert("end", "16 - help me\n")
+            terminal_output.insert("end", "17 - rickroll\n")
+            terminal_output.insert("end", "18 - start game\n")
+            terminal_output.insert("end", "19 - hogwarts\n")
+            terminal_output.insert("end", "20 - this is what you asked for\n")
+            terminal_output.insert("end", "21 - cyberpunk\n")
+            terminal_output.insert("end", "22 - make me a sandwich\n")
+            terminal_output.insert("end", "23 - sudo make me a sandwich\n")
+            terminal_output.insert("end", "24 - 42\n")
+            terminal_output.insert("end", "25 - big smoke\n")
+            terminal_output.insert("end", "26 - hesoyam\n")
+            terminal_output.insert("end", "27 - shrek is love\n")
+            terminal_output.insert("end", "28 - cavalo\n")
+            terminal_output.insert("end", "29 - interagir/z/undertale\n")
+            terminal_output.insert("end", "30 - draven\n")
+            terminal_output.insert("end", "31 - akali\n")
+            terminal_output.insert("end", "32 - zomboid/project zomboid\n")
+            terminal_output.insert("end", "33 - pedra/papel/tesoura\n")
         else:
             terminal_output.insert("end", f"Comando '{texto_comando}' não reconhecido. Selecione um script para executar ou use 'tutorial'.\n")
         terminal_output.see("end")
@@ -493,7 +496,7 @@ def atualizar_arquivo_atual(arquivo):
     ultimos_label.config(text=f"Arquivo atual:\n{os.path.basename(arquivo)}")
 
 def abrir_documentacao():
-    webbrowser.open_new_tab("https://github.com/Monarca-lang/Monarca/blob/main/Documenta%C3%A7%C3%A3o.md")
+    webbrowser.open_new_tab("https://github.com/Monarca-lang/Monarca/blob/main/documentacao.md")
 
 def alternar_tema():
     config["tema"] = "claro" if config["tema"] == "escuro" else "escuro"
