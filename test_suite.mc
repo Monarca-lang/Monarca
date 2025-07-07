@@ -130,7 +130,7 @@ deletar variável para_deletar
 mostrar na tela: "  (SUCESSO) Variável 'para_deletar' foi deletada."
 
 mostrar na tela: "5.2. Teste de entrada (digite seu nome):"
-variável nome_usuario recebe "aiai"
+variável nome_usuario recebe entrada:
 mostrar na tela: "  (SUCESSO) Olá, " nome_usuario "! O teste de entrada funcionou."
 mostrar na tela: ""
 
