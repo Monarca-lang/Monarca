@@ -125,7 +125,7 @@ mostrar na tela: "Minha idade é " idade
 Desta forma, é possível encadear diversas operações uma após a outra, de modo que sejam executadas pela ordem aritmética comum/correta.
 
 # Estruturas Condicionais
-## Se (ainda desenvolvendo sintaxe)
+## Se 
 A estrutura `se` pode ser utilizada para iniciar um bloco de comandos a serem executados caso uma certa declaração lógica (booleana) seja interpretada como verdadeira. 
 
 Exemplo:
@@ -134,12 +134,39 @@ Exemplo:
 se "a" é igual "b" então:
     mostrar na tela: "a é igual a b"
 ```
+## Se/Senão
+A estrutura `se/senão` diferentemente da estrutura `se`, fornece um bloco alternativo caso uma certa declaração lógica (booleana) não seja intpratada como verdadeira.
 
+Exemplo:
 
+```pseudocode
+se "a" é igual "b" então:
+    mostrar na tela: "a é igual a b"
+senão então:
+    mostrar na tela: "a é diferente de b"
+```
+# Estruturas de Repetição
+## Enquanto
+A estrutura `enquanto` repete um conjunto de comandos até que uma declaração lógica (booleana) assuma um certo valor.
 
+Exemplo:
+
+```pseudocode
+enquanto n é menor que 10 então:
+    mostrar na tela: n
+    variável n recebe n mais 1
+```
+## Para
 
 # Questionamentos Previstos:
+A estrutura `para` repete um conjunto de comandos utilizando um contador e um ponto de parada.
 
+Exemplo:
+
+```pseudocode
+para contando até 3:
+    mostrar na tela: "Esta é uma mensagem dentro de um laço!"
+```
 
 * > ***Como posso comentar meu código?***
 
