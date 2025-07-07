@@ -1,13 +1,21 @@
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from tkinterdnd2 import DND_FILES, TkinterDnD
-from PIL import Image, ImageTk
+from PIL import Image, ImageTk, ImageSequence
 import os
 import subprocess
 import sys
 import threading
 import webbrowser
 import json
+
+# Inicialização do Pygame para áudio
+try:
+    import pygame
+    pygame.mixer.init()
+    PYGAME_DISPONIVEL = True
+except (ImportError, Exception) as e:
+    PYGAME_DISPONIVEL = False
 
 CONFIG_PATH = "config.json"
 DEFAULT_CONFIG = {
@@ -44,8 +52,14 @@ TEMAS = {
 }
 
 BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+ASSETS_DIR = os.path.join(BASE_DIR, "assets")
+
+if not os.path.exists(ASSETS_DIR):
+    os.makedirs(ASSETS_DIR)
 
 processo = None
+comando_historico = []
+historico_index = 0
 
 # Usamos TkinterDnD.Tk ao invés de tk.Tk para suportar drag and drop
 root = TkinterDnD.Tk()
@@ -73,6 +87,7 @@ def aplicar_tema():
     label_versao_launcher.config(bg=tema_cores["left_panel_bg"], fg=tema_cores["button_fg"])
     logo_container.config(bg=tema_cores["left_panel_bg"])
     logo_label.config(bg=tema_cores["left_panel_bg"])
+    logo_subtext_label.config(bg=tema_cores["left_panel_bg"], fg=tema_cores["button_fg"])
 
 painel_esquerdo = ttk.Frame(root, style="My.TFrame")
 painel_esquerdo.pack(side="left", fill="y")
@@ -93,19 +108,284 @@ terminal_output.config(yscrollcommand=scrollbar.set)
 input_entry = tk.Entry(terminal_frame, font=("Consolas", 11))
 input_entry.pack(fill="x", side="bottom", padx=(0, 0), pady=(0, 5))
 
+def navegar_historico_cima(event):
+    global historico_index
+    if comando_historico and historico_index > 0:
+        historico_index -= 1
+        input_entry.delete(0, tk.END)
+        input_entry.insert(0, comando_historico[historico_index])
+        return "break"
+
+def navegar_historico_baixo(event):
+    global historico_index
+    if comando_historico and historico_index < len(comando_historico) - 1:
+        historico_index += 1
+        input_entry.delete(0, tk.END)
+        input_entry.insert(0, comando_historico[historico_index])
+    elif historico_index == len(comando_historico) - 1:
+        historico_index += 1
+        input_entry.delete(0, tk.END)
+    return "break"
+
 def enviar_input(event=None):
-    texto = input_entry.get()
-    if processo and processo.stdin:
-        try:
-            terminal_output.insert("end", texto + "\n")
-            terminal_output.see("end")
-            processo.stdin.write(texto + "\n")
-            processo.stdin.flush()
-        except Exception as e:
-            print("Erro ao enviar input:", e)
+    global historico_index
+    texto_original = input_entry.get()
+    if not texto_original:
+        return
+
+    if not comando_historico or comando_historico[-1] != texto_original:
+        comando_historico.append(texto_original)
+    historico_index = len(comando_historico)
+
+    texto_comando = texto_original.lower().strip()
     input_entry.delete(0, tk.END)
 
+    # Se um script estiver em execução, envia o input para ele
+    if processo and processo.poll() is None:
+        try:
+            terminal_output.insert("end", texto_original + "\n")
+            terminal_output.see("end")
+            if processo.stdin:
+                processo.stdin.write(texto_original + "\n")
+                processo.stdin.flush()
+        except (IOError, BrokenPipeError):
+            terminal_output.insert("end", "\n[Processo encerrado, não é possível enviar input.]\n")
+            terminal_output.see("end")
+        except Exception as e:
+            print("Erro ao enviar input:", e)
+    else:
+        # Se nenhum script estiver rodando, processa comandos locais/easter eggs
+        terminal_output.insert("end", f"> {texto_original}\n") # Echo do comando
+        input_easteregg = texto_comando.lower()
+        if input_easteregg == "tutorial":
+            mostrar_tutorial()
+        elif input_easteregg == "arthur morgan":
+            terminal_output.insert("end", "He was a good man...\n")
+        elif input_easteregg == "iddqd":
+            terminal_output.insert("end", "God mode ativado.\n")
+        elif input_easteregg == "up up down down left right left right b a":
+            terminal_output.insert("end", "Konami Code detectado. Modo debug ativo.\n")
+        elif input_easteregg == "bolo" or input_easteregg == "cake":
+            terminal_output.insert("end", "The cake is a lie.\n")
+        elif input_easteregg == "fus ro dah":
+            terminal_output.insert("end", "Você gritou tão forte que apagou o interpretador.\n")
+        elif input_easteregg == "i need healing":
+            terminal_output.insert("end", "Você digitou isso 12 vezes nos últimos 2 minutos. Genji detectado.\n")
+        elif input_easteregg == "minecraft":
+            terminal_output.insert("end", "The end?\n")
+        elif input_easteregg == "sus":
+            terminal_output.insert("end", "amogus\n")
+            play_easter_egg("sus")
+        elif input_easteregg == "nmap -sS 127.0.0.1":
+            terminal_output.insert("end", "Aqui não.\n")
+        elif input_easteregg == "sudo rm -rf":
+            terminal_output.insert("end", "Não vai rolar.\n")
+        elif input_easteregg == "telnet towel.blinkenlights.nl":
+            terminal_output.insert("end", "Isso não funciona aqui, mas parabéns por tentar...\n")
+        elif input_easteregg == "hello world":
+            terminal_output.insert("end", "Você é oficialmente um programador júnior agora.\n")
+        elif input_easteregg == "roll d20":
+            play_easter_egg("d20")
+            import random
+            r = random.randint(1, 20)
+            if r == 1:
+                terminal_output.insert("end", "Você tropeça e bate a cabeça no chão.\n")
+            elif r == 20:
+                terminal_output.insert("end", "Acerto crítico: você compila de primeira.\n")
+            else:
+                terminal_output.insert("end", f"Você rolou {r}. Nada épico, nada vergonhoso.\n")
+        elif input_easteregg == "cast fireball":
+            terminal_output.insert("end", "🧙 Você causou 8d6 de dano. O terminal agora está levemente chamuscado.\n")
+        elif input_easteregg == "whoami":
+            terminal_output.insert("end", "Você é quem digita. Mas será que você é quem decide?\n")
+        elif input_easteregg == "help me":
+            terminal_output.insert("end", "VOCÊ NÃO PRECISA DE AJUDA, VOCÊ PRECISA DE CORAGEM\n")
+        elif input_easteregg == "rickroll":
+            play_easter_egg("rickroll")
+        elif input_easteregg == "start game":
+            terminal_output.insert("end", "Você acorda em um terminal escuro. Uma opção pisca: 'iniciar'\n")
+        elif input_easteregg == "hogwarts":
+            terminal_output.insert("end", "Diretamente de Hogwarts, Wingardium Levirola\n")
+            play_easter_egg("hogwarts")
+        elif input_easteregg == "this is what you asked for":
+            play_easter_egg("linkinpark")
+            terminal_output.insert("end", "Heavy is the crown\nFire in the sunrise, ashes raining down\nTrying to hold it in\nBut it keeps bleeding out\nThis is what you asked for, heavy is the\nHeavy is the crown!\n")
+        elif input_easteregg == "cyberpunk":
+            play_easter_egg("cyberpunk")
+            terminal_output.insert("end", "Wake the fuck up, Samurai.\nWe got a city to burn.\n")
+        elif input_easteregg == "sudo make me a sandwich":
+            terminal_output.insert("end", "Okay. 🥪 Feito. Mas só dessa vez.\n")
+        elif input_easteregg == "42":
+            terminal_output.insert("end", "Resposta para a Vida, o Universo e Tudo Mais.\n")
+        elif input_easteregg == "big smoke":
+            play_easter_egg("smoke")
+            terminal_output.insert("end", "I'll have two number 9's, a number 9 large,\na number 6 with extra dip, a number 7,\ntwo number 45's, one with cheese, and a large soda.\n")
+        elif input_easteregg == "hesoyam":
+            play_easter_egg("gta")
+            terminal_output.insert("end", "Trapaça ativada.\n")
+        elif input_easteregg == "shrek is love":
+            terminal_output.insert("end", "Shrek é vida.\n")
+        elif input_easteregg == "cavalo":
+            play_easter_egg("vacalo")
+        elif input_easteregg == "interagir":
+            terminal_output.insert("end", "Interagir com o terminal te enche de determinação.\n")
+            play_easter_egg("undertale")
+        elif input_easteregg == "draven":
+            import random
+            num = random.randint(1, 2)
+            if num == 1:
+                terminal_output.insert("end", "Bem vindos a League of Draven!\n")
+                play_easter_egg("leaguedraven")
+            else:
+                terminal_output.insert("end", "Não é Dráven. É Draaaaven.\n")
+                play_easter_egg("draven")
+        elif input_easteregg == "akali":
+            terminal_output.insert("end", "Temam a assassina sem mestre.\n")
+            play_easter_egg("akali")
+        elif input_easteregg == "zomboid" or input_easteregg == "project zomboid":
+            terminal_output.insert("end", "This is how you died.\n")
+            play_easter_egg("zomboid")
+        elif input_easteregg in ["limpar", "cls"]:
+            terminal_output.delete("1.0", "end")
+        elif input_easteregg == "ajuda" or input_easteregg == "help" or input_easteregg == "comandos":
+            terminal_output.insert("end", "Comandos disponíveis:\n")
+            terminal_output.insert("end", "- tutorial: Inicia o tutorial interativo.\n")
+            terminal_output.insert("end", "- limpar/cls: Limpa o terminal.\n")
+            terminal_output.insert("end", "- docs: Abre a documentação do Monarca.\n")
+        elif input_easteregg == "docs":
+            abrir_documentacao()
+        elif input_easteregg == "totó é um mamífero":
+            terminal_output.insert("end", "lista de easter eggs:\n")
+            terminal_output.insert("end", "- arthur morgan\n")
+            terminal_output.insert("end", "- iddqd\n")
+            terminal_output.insert("end", "- up up down down left right left right b a\n")
+            terminal_output.insert("end", "- bolo/cake\n")
+            terminal_output.insert("end", "- fus ro dah\n")
+            terminal_output.insert("end", "- i need healing\n")
+            terminal_output.insert("end", "- minecraft\n")
+            terminal_output.insert("end", "- sus\n")
+            terminal_output.insert("end", "- nmap -sS 127.0.0.1\n")
+            terminal_output.insert("end", "- sudo rm -rf\n")
+            terminal_output.insert("end", "- telnet towel.blinkenlights.nl\n")
+            terminal_output.insert("end", "- hello world\n")
+            terminal_output.insert("end", "- roll d20\n")
+            terminal_output.insert("end", "- cast fireball\n")
+            terminal_output.insert("end", "- whoami\n")
+            terminal_output.insert("end", "- help me\n")
+            terminal_output.insert("end", "- rickroll\n")
+            terminal_output.insert("end", "- start game\n")
+            terminal_output.insert("end", "- hogwarts\n")
+            terminal_output.insert("end", "- this is what you asked for\n")
+            terminal_output.insert("end", "- cyberpunk\n")
+            terminal_output.insert("end", "- sudo make me a sandwich\n")
+            terminal_output.insert("end", "- 42\n")
+            terminal_output.insert("end", "- big smoke\n")
+            terminal_output.insert("end", "- hesoyam\n")
+            terminal_output.insert("end", "- shrek is love\n")
+            terminal_output.insert("end", "- cavalo\n")
+            terminal_output.insert("end", "- interagir\n")
+            terminal_output.insert("end", "- draven\n")
+            terminal_output.insert("end", "- akali\n")
+            terminal_output.insert("end", "- zomboid/project zomboid\n")
+        else:
+            terminal_output.insert("end", f"Comando '{texto_comando}' não reconhecido. Selecione um script para executar ou use 'tutorial'.\n")
+        terminal_output.see("end")
+
 input_entry.bind("<Return>", enviar_input)
+input_entry.bind("<Up>", navegar_historico_cima)
+input_entry.bind("<Down>", navegar_historico_baixo)
+
+def animate_gif(window, label, frames, frame_index=0):
+    """Função recursiva para animar um GIF em um widget Label."""
+    try:
+        frame = frames[frame_index]
+        label.config(image=frame)
+        frame_index = (frame_index + 1) % len(frames)
+        # A velocidade da animação pode ser ajustada (aqui, 100ms por frame)
+        window.after(100, animate_gif, window, label, frames, frame_index)
+    except tk.TclError:
+        # A janela foi fechada, para a animação
+        pass
+
+def play_easter_egg(name):
+    """
+    Procura e reproduz um arquivo de mídia (áudio/imagem/gif) para um easter egg.
+    A busca é feita na pasta 'assets'.
+    """
+    audio_exts = ['.mp3', '.wav']
+    image_exts = ['.gif', '.png', '.jpg', '.jpeg']
+
+    # Procura por áudio primeiro
+    if PYGAME_DISPONIVEL:
+        for ext in audio_exts:
+            path = os.path.join(ASSETS_DIR, f"{name}{ext}")
+            if os.path.exists(path):
+                try:
+                    # Toca o som em uma thread separada para não bloquear a UI
+                    def play_sound():
+                        pygame.mixer.music.load(path)
+                        pygame.mixer.music.play()
+                    threading.Thread(target=play_sound, daemon=True).start()
+                    return # Para aqui se encontrar um áudio
+                except Exception as e:
+                    print(f"Erro ao tocar áudio {path}: {e}")
+
+    # Se não encontrou áudio, procura por imagem/gif
+    for ext in image_exts:
+        path = os.path.join(ASSETS_DIR, f"{name}{ext}")
+        if os.path.exists(path):
+            try:
+                win = tk.Toplevel(root)
+                win.title(name.replace("_", " ").title())
+                win.resizable(False, False)
+
+                img_raw = Image.open(path)
+
+                # --- Lógica de redimensionamento ---
+                largura_painel = painel_esquerdo.winfo_width()
+                largura_alvo = int(largura_painel * 0.8)
+                
+                proporcao = img_raw.height / img_raw.width
+                altura_alvo = int(largura_alvo * proporcao)
+                # --- Fim da lógica de redimensionamento ---
+
+                if ext == '.gif':
+                    # Redimensiona cada frame do GIF
+                    frames_resized = []
+                    for frame in ImageSequence.Iterator(img_raw):
+                        frame_resized = frame.copy().resize((largura_alvo, altura_alvo), Image.LANCZOS)
+                        frames_resized.append(ImageTk.PhotoImage(frame_resized))
+                    
+                    label = tk.Label(win, borderwidth=0)
+                    label.pack()
+                    win.after(0, animate_gif, win, label, frames_resized)
+                else:
+                    img_resized = img_raw.resize((largura_alvo, altura_alvo), Image.LANCZOS)
+                    img_tk = ImageTk.PhotoImage(img_resized)
+                    label = tk.Label(win, image=img_tk, borderwidth=0)
+                    label.image = img_tk  # Mantém referência para evitar garbage collection
+                    label.pack()
+
+                # Centraliza a janela pop-up na janela principal
+                win.transient(root) # Associa a janela pop-up à principal
+                win.update_idletasks()
+
+                # Calcula a posição para centralizar a janela pop-up em relação à janela principal
+                root_x = root.winfo_x()
+                root_y = root.winfo_y()
+                root_width = root.winfo_width()
+                root_height = root.winfo_height()
+
+                win_width = win.winfo_width()
+                win_height = win.winfo_height()
+
+                pos_x = root_x + (root_width // 2) - (win_width // 2)
+                pos_y = root_y + (root_height // 2) - (win_height // 2)
+
+                win.geometry(f"+{pos_x}+{pos_y}")
+                return # Para aqui se encontrar uma imagem
+            except Exception as e:
+                print(f"Erro ao exibir imagem {path}: {e}")
 
 def abrir_arquivo_mc():
     path = filedialog.askopenfilename(filetypes=[("Arquivos Monarca", "*.mc")])
@@ -123,14 +403,31 @@ def abrir_arquivo(path):
         messagebox.showerror("Erro", "Por favor, selecione um arquivo '.mc' válido.")
 
 def ler_stream(stream):
-    global processo
+    # State machine to strip ANSI escape codes while reading char by char
+    # This avoids buffering issues with interactive input prompts
+    state = "NORMAL"  # Can be "NORMAL", "GOT_ESC", "IN_SEQ"
     while True:
         char = stream.read(1)
         if char == "" and processo.poll() is not None:
             break
-        if char:
-            terminal_output.insert("end", char)
-            terminal_output.see("end")
+        if not char:
+            continue
+
+        if state == "NORMAL":
+            if char == '\033':
+                state = "GOT_ESC"
+            else:
+                terminal_output.insert("end", char)
+                terminal_output.see("end")
+        elif state == "GOT_ESC":
+            if char == '[':
+                state = "IN_SEQ"
+            else:
+                state = "NORMAL" # Not a CSI sequence, consume and reset
+        elif state == "IN_SEQ":
+            if '@' <= char <= '~':  # Sequence ends with a char in this range
+                state = "NORMAL"
+            # else: still in sequence, so we consume the char by doing nothing
 
 def executar_script(arquivo):
     global processo
@@ -199,8 +496,8 @@ info_label = tk.Label(frame_controle, text="Informações da linguagem Monarca:"
 info_label.pack(fill="x", pady=(0, 0))
 
 # Subtextos com informações adicionais
-versao_interpretador = "Versão do interpretador: nem perto de produção" #+ sys.version.split()[0]
-versao_launcher = "Versão do Launcher: 0.6.9"  # Pode pegar dinamicamente se tiver como
+versao_interpretador = "Versão do interpretador: bom o suficiente (turing-complete)" #+ sys.version.split()[0]
+versao_launcher = "Versão do Launcher: 4.2.0"  # Pode pegar dinamicamente se tiver como
 
 label_versao_interpretador = tk.Label(frame_controle, text=versao_interpretador, font=("Segoe UI", 9), justify="left")
 label_versao_interpretador.pack(fill="x", padx=5, pady=(2, 0))
@@ -233,6 +530,10 @@ btn_tema = criar_botao("Alternar tema", alternar_tema)
 logo_container = tk.Frame(painel_esquerdo)
 logo_container.pack(side="bottom", fill="both", expand=True, pady=10)
 
+# Texto embaixo do logo
+logo_subtext_label = tk.Label(logo_container, text='"Eu sou mais louco que todos vocês."', font=("Segoe UI", 8, "italic"), fg="#696969")
+logo_subtext_label.pack(side="bottom", pady=(0, 10))
+
 # Debounce helper for logo resizing
 class Debounce:
     def __init__(self, func, wait=100):
@@ -251,7 +552,7 @@ try:
 
     def redimensionar_logo():
         largura = painel_esquerdo.winfo_width()
-        altura = int(painel_esquerdo.winfo_height() * 0.4)
+        altura = int(painel_esquerdo.winfo_height() * 0.35)
         if largura and altura:
             proporcao_original = logo_img_raw.width / logo_img_raw.height
             largura_alvo = int(altura * proporcao_original)
@@ -270,7 +571,7 @@ try:
     painel_esquerdo.bind("<Configure>", lambda e: debounced_resize())
     redimensionar_logo()
 except Exception as e:
-    logo_label = tk.Label(logo_container, text="[LOGO MONARCA]", fg="white", font=("Segoe UI", 18, "bold"))
+    logo_label = tk.Label(logo_container, text="[logo aqui]", fg="white", font=("Segoe UI", 18, "bold"))
     logo_label.pack(pady=5)
 
 # --- Drag and Drop Fix ---

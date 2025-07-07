@@ -130,25 +130,56 @@ deletar variável para_deletar
 mostrar na tela: "  (SUCESSO) Variável 'para_deletar' foi deletada."
 
 mostrar na tela: "5.2. Teste de entrada (digite seu nome):"
-variável nome_usuario recebe entrada:
+variável nome_usuario recebe "aiai"
 mostrar na tela: "  (SUCESSO) Olá, " nome_usuario "! O teste de entrada funcionou."
 mostrar na tela: ""
 
 ::info ===================================================
-mostrar na tela: "--- 6. Testes de Erros (Descomente para testar) ---"
+mostrar na tela: "--- 6. Testes de Laços (para) ---"
+::info ===================================================
+
+mostrar na tela: "6.1. Laço simples (3 iterações):"
+para contando até 3:
+    mostrar na tela: "  (SUCESSO) Iteração do laço."
+
+mostrar na tela: "6.2. Laço com condicional e variável:"
+variável contador_laco recebe 0
+para contando até 5:
+    se contador_laco é igual a 3 então:
+        mostrar na tela: "  (SUCESSO) Condicional dentro do laço na iteração 3."
+    variável contador_laco recebe contador_laco mais 1
+mostrar na tela: "  (SUCESSO) Valor final do contador (deve ser 5): " contador_laco
+
+mostrar na tela: "6.3. Laços aninhados:"
+variável contador_externo recebe 0
+para contando até 2:
+    variável contador_externo recebe contador_externo mais 1
+    variável contador_interno recebe 0
+    para contando até 2:
+        variável contador_interno recebe contador_interno mais 1
+        mostrar na tela: "  (SUCESSO) Laço externo: " contador_externo ", Laço interno: " contador_interno
+
+mostrar na tela: "6.4. Laço com 0 iterações:"
+para contando até 0:
+    mostrar na tela: "  (FALHA) Este texto não deve aparecer."
+mostrar na tela: "  (SUCESSO) O laço com 0 iterações foi pulado corretamente."
+mostrar na tela: ""
+
+::info ===================================================
+mostrar na tela: "--- 7. Testes de Erros (Descomente para testar) ---"
 ::info mostrar na tela: "Os testes abaixo devem gerar erros. Execute um por vez."
 ::info ===================================================
 
-::info Teste 6.1: Usar variável não declarada
+::info Teste 7.1: Usar variável não declarada
 ::info mostrar na tela: variavel_inexistente
 
-::info Teste 6.2: Divisão por zero
+::info Teste 7.2: Divisão por zero
 ::info variável div_zero recebe 10 dividido por 0
 
-::info Teste 6.3: Sintaxe incompleta
+::info Teste 7.3: Sintaxe incompleta
 ::info variável x recebe
 
-::info Teste 6.4: 'senão' sem 'se'
+::info Teste 7.4: 'senão' sem 'se'
 ::info se falso então:
 ::info     mostrar na tela: "não vai aparecer"
 ::info senão então:
@@ -157,13 +188,13 @@ mostrar na tela: "--- 6. Testes de Erros (Descomente para testar) ---"
 ::info senão então: ::info Este 'senão' está desalinhado e sem um 'se' correspondente
 ::info     mostrar na tela: "erro aqui"
 
-::info Teste 6.5: Deletar variável inexistente
+::info Teste 7.5: Deletar variável inexistente
 ::info deletar variável var_que_nao_existe
 
-::info Teste 6.6: Parênteses desbalanceados
+::info Teste 7.6: Parênteses desbalanceados
 ::info variável erro_paren recebe (5 mais 3
 
-::info Teste 6.7: Erro de indentação
+::info Teste 7.7: Erro de indentação
 ::info se verdadeiro então:
 ::info   mostrar na tela: "indentação errada"
 
