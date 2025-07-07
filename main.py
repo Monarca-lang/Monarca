@@ -29,7 +29,7 @@ for c, linha in enumerate(script):
     # Ignora comentários
     if '::info' in linha_original:
         índice = linha_original.find('::info')
-        linha_original = linha_original[:índice]
+        linha_original = linha_original[:índice].rstrip() # Essa linha faz com que comentários a direita dos ifs não quebrem a busca pelo "então:"
     
     # Checa se é uma linha vazia. Se sim, apenas pula para a próxima.
     if linha_original.strip() == '':
@@ -128,7 +128,9 @@ for c, linha in enumerate(script):
             dica = f'\033[1;32mdeletar\033[0m variável [nome]'
         elif chute == 'se':
             dica = f'\033[1;32mse\033[0m [condição] então:'
-        
+        elif chute == 'senão':
+            dica = f'\033[1;32msenão\033[0m então:'
+
         monarca.erro(f'Comando "{dlinha[0]}" não encontrado. Consulte a documentação.', dica)   
         
 tempo_final = time()

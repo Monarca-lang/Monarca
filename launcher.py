@@ -8,7 +8,6 @@ import sys
 import threading
 import webbrowser
 import json
-import time
 
 CONFIG_PATH = "config.json"
 DEFAULT_CONFIG = {
@@ -31,7 +30,7 @@ TEMAS = {
     "escuro": {
         "left_panel_bg": "#2e2e3e",
         "button_bg": "#3a3a5a",
-        "button_fg": "white",
+        "button_fg": "#ffffff",
         "terminal_bg": "#000000",
         "terminal_fg": "#ffffff"
     },
@@ -45,7 +44,6 @@ TEMAS = {
 }
 
 BASE_DIR = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
-FONTE_PADRAO = ("Segoe UI", 11)
 
 processo = None
 
@@ -71,6 +69,8 @@ def aplicar_tema():
     input_entry.config(bg=tema_cores["terminal_bg"], fg=tema_cores["terminal_fg"], insertbackground=tema_cores["terminal_fg"])
     ultimos_label.config(bg=tema_cores["left_panel_bg"], fg=tema_cores["button_fg"])
     info_label.config(bg=tema_cores["left_panel_bg"], fg=tema_cores["button_fg"])
+    label_versao_interpretador.config(bg=tema_cores["left_panel_bg"], fg=tema_cores["button_fg"])
+    label_versao_launcher.config(bg=tema_cores["left_panel_bg"], fg=tema_cores["button_fg"])
     logo_container.config(bg=tema_cores["left_panel_bg"])
     logo_label.config(bg=tema_cores["left_panel_bg"])
 
@@ -80,18 +80,17 @@ painel_esquerdo.pack(side="left", fill="y")
 frame_controle = ttk.Frame(painel_esquerdo, style="My.TFrame")
 frame_controle.pack(side="top", fill="both", expand=True, padx=10, pady=10)
 
-terminal_frame = tk.Frame(root, bg=TEMAS[config["tema"]]["terminal_bg"])
+terminal_frame = tk.Frame(root)
 terminal_frame.pack(side="right", fill="both", expand=True, padx=5, pady=5)
 
-terminal_output = tk.Text(terminal_frame, bg=TEMAS[config["tema"]]["terminal_bg"], fg=TEMAS[config["tema"]]["terminal_fg"],
-                          insertbackground=TEMAS[config["tema"]]["terminal_fg"], font=("Consolas", 11), wrap="none", borderwidth=0, highlightthickness=0)
+terminal_output = tk.Text(terminal_frame, font=("Consolas", 11), wrap="none", borderwidth=0, highlightthickness=0)
 terminal_output.pack(fill="both", expand=True, side="top", padx=(0, 0), pady=(5, 5))
 
 scrollbar = ttk.Scrollbar(terminal_frame, orient="vertical", command=terminal_output.yview)
 scrollbar.pack(side="right", fill="y", pady=(5, 5))
 terminal_output.config(yscrollcommand=scrollbar.set)
 
-input_entry = tk.Entry(terminal_frame, bg=TEMAS[config["tema"]]["terminal_bg"], fg=TEMAS[config["tema"]]["terminal_fg"], insertbackground=TEMAS[config["tema"]]["terminal_fg"], font=("Consolas", 11))
+input_entry = tk.Entry(terminal_frame, font=("Consolas", 11))
 input_entry.pack(fill="x", side="bottom", padx=(0, 0), pady=(0, 5))
 
 def enviar_input(event=None):
@@ -123,20 +122,10 @@ def abrir_arquivo(path):
     else:
         messagebox.showerror("Erro", "Por favor, selecione um arquivo '.mc' válido.")
 
-def ler_stdout():
+def ler_stream(stream):
     global processo
     while True:
-        char = processo.stdout.read(1)
-        if char == "" and processo.poll() is not None:
-            break
-        if char:
-            terminal_output.insert("end", char)
-            terminal_output.see("end")
-
-def ler_stderr():
-    global processo
-    while True:
-        char = processo.stderr.read(1)
+        char = stream.read(1)
         if char == "" and processo.poll() is not None:
             break
         if char:
@@ -164,8 +153,15 @@ def executar_script(arquivo):
         bufsize=1
     )
 
-    threading.Thread(target=ler_stdout, daemon=True).start()
-    threading.Thread(target=ler_stderr, daemon=True).start()
+    threading.Thread(target=ler_stream, args=(processo.stdout,), daemon=True).start()
+    threading.Thread(target=ler_stream, args=(processo.stderr,), daemon=True).start()
+
+def reexecutar_script():
+    if config.get("last_file") and os.path.exists(config["last_file"]):
+        executar_script(config["last_file"])
+        input_entry.focus_set()
+    else:
+        messagebox.showwarning("Aviso", "Nenhum arquivo foi executado anteriormente para re-executar.")
 
 def parar_execucao():
     global processo
@@ -196,20 +192,20 @@ def criar_botao(texto, comando):
     btn.pack(pady=6, ipadx=10)
     return btn
 
-ultimos_label = tk.Label(frame_controle, text="Arquivo atual:\n(nenhum)", fg=TEMAS[config["tema"]]["button_fg"], font=("Segoe UI", 12, "bold"), justify="left", bg=TEMAS[config["tema"]]["left_panel_bg"])
+ultimos_label = tk.Label(frame_controle, text="Arquivo atual:\n(nenhum)", font=("Segoe UI", 12, "bold"), justify="left")
 ultimos_label.pack(fill="x", pady=(0, 10))
 
-info_label = tk.Label(frame_controle, text="Informações da linguagem Monarca:", fg=TEMAS[config["tema"]]["button_fg"], font=("Segoe UI", 12), justify="left", bg=TEMAS[config["tema"]]["left_panel_bg"])
+info_label = tk.Label(frame_controle, text="Informações da linguagem Monarca:", font=("Segoe UI", 12), justify="left")
 info_label.pack(fill="x", pady=(0, 0))
 
 # Subtextos com informações adicionais
 versao_interpretador = "Versão do interpretador: nem perto de produção" #+ sys.version.split()[0]
 versao_launcher = "Versão do Launcher: 0.6.9"  # Pode pegar dinamicamente se tiver como
 
-label_versao_interpretador = tk.Label(frame_controle, text=versao_interpretador, fg=TEMAS[config["tema"]]["button_fg"], font=("Segoe UI", 9), justify="left", bg=TEMAS[config["tema"]]["left_panel_bg"])
+label_versao_interpretador = tk.Label(frame_controle, text=versao_interpretador, font=("Segoe UI", 9), justify="left")
 label_versao_interpretador.pack(fill="x", padx=5, pady=(2, 0))
 
-label_versao_launcher = tk.Label(frame_controle, text=versao_launcher, fg=TEMAS[config["tema"]]["button_fg"], font=("Segoe UI", 9), justify="left", bg=TEMAS[config["tema"]]["left_panel_bg"])
+label_versao_launcher = tk.Label(frame_controle, text=versao_launcher, font=("Segoe UI", 9), justify="left")
 label_versao_launcher.pack(fill="x", padx=5, pady=(0, 10))
 
 def mostrar_tutorial():
@@ -228,12 +224,13 @@ def mostrar_tutorial():
 
 btn_tutorial = criar_botao("Tutorial", mostrar_tutorial)
 btn_mc = criar_botao("Selecionar arquivo .MC", abrir_arquivo_mc)
+btn_reexecutar = criar_botao("Re-executar último", reexecutar_script)
 btn_parar_exec = criar_botao("Parar execução", parar_execucao)
 btn_doc = criar_botao("Abrir documentação", abrir_documentacao)
 btn_tema = criar_botao("Alternar tema", alternar_tema)
 
 # LOGO
-logo_container = tk.Frame(painel_esquerdo, bg=TEMAS[config["tema"]]["left_panel_bg"])
+logo_container = tk.Frame(painel_esquerdo)
 logo_container.pack(side="bottom", fill="both", expand=True, pady=10)
 
 # Debounce helper for logo resizing
@@ -266,7 +263,7 @@ try:
             logo_label.config(image=logo_img_tk)
             logo_label.image = logo_img_tk
 
-    logo_label = tk.Label(logo_container, bg=TEMAS[config["tema"]]["left_panel_bg"])
+    logo_label = tk.Label(logo_container)
     logo_label.pack(expand=True)
     # Use debounce for resize event to avoid lag
     debounced_resize = Debounce(redimensionar_logo, wait=120)

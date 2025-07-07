@@ -17,7 +17,9 @@ class Monarca:
             'dividido por',
             'igual',
             'ou',
-            'e'
+            'e',
+            '(',
+            ')'
         )
         self.opcondicionais = {
             'é igual a',
@@ -60,6 +62,7 @@ class Monarca:
                 else:                    
                     trecho = expressao[0:]
                     expressao = ''
+                trecho = trecho.replace('(', ' ( ').replace(')', ' ) ')
                 for palavra in trecho.split(): # Leitura do trecho. Checa e substitui as variáveis, checa a validade dos números, etc
                     if palavra in self.variaveis.keys():
                         palavra = self.variaveis[palavra]
@@ -75,8 +78,31 @@ class Monarca:
     
     def calcular(self, elementos):
         i = 0
-        try:      
-            while 'vezes' in elementos or 'dividido' in elementos:                                      
+        try:
+            # Resolução de parênteses (recursivamente)
+            while '(' in elementos:
+                start_index = -1
+                # Encontra o último '(', que corresponde ao grupo mais interno
+                for i_paren, token in enumerate(elementos):
+                    if token == '(':
+                        start_index = i_paren
+                
+                # Encontra o ')' correspondente
+                end_index = -1
+                for i_paren in range(start_index, len(elementos)):
+                    if elementos[i_paren] == ')':
+                        end_index = i_paren
+                        break
+                
+                if start_index == -1 or end_index == -1:
+                    self.erro("Erro de sintaxe com parênteses não balanceados.")
+
+                sub_expressao = elementos[start_index + 1 : end_index]
+                resultado_sub = self.calcular(sub_expressao)
+                del elementos[start_index : end_index + 1]
+                elementos.insert(start_index, resultado_sub[0])
+
+            while 'vezes' in elementos or 'dividido' in elementos:
                 if elementos[i] == 'vezes':
                     num1 = elementos[i - 1]
                     num1 = float(num1) if '.' in num1 else int(num1)
@@ -98,9 +124,10 @@ class Monarca:
                     num1 = float(num1) if '.' in num1 else int(num1)
                     num2 = elementos[i + 2]
                     num2 = float(num2) if '.' in num2 else int(num2) 
-                    resultado = num1 / num2 
-                    elementos[i+2] = str(resultado)                   
-                    elementos = elementos[i+2:]
+                    resultado = num1 / num2
+                    del elementos[i-1:i+3] # Remove 'num1', 'dividido', 'por', 'num2'
+                    elementos.insert(i-1, str(resultado))
+                    i = 0
                 else:
                     i += 1 
             i = 0
@@ -118,6 +145,7 @@ class Monarca:
                     elementos[i+1] = str(resultado)                 
                     elementos.pop(i - 1)                    
                     elementos.pop(i - 1)                                        
+                    i = 0
                 else:
                     i += 1
             i = 0
@@ -137,11 +165,20 @@ class Monarca:
                         dica = f'{elementos[i-2]} é igual\033[1;32m a\033[0m {elementos[i+1]}'
                         self.erro('O termo "a" deve ser explicitado ao usar o operador "igual a".', dica)    
                           
-                    num1 = float(elementos[i - 2]) if elementos[i - 2].replace('.', '').isnumeric() else elementos[i - 2]
-                    num2 = float(elementos[i + 2]) if elementos[i + 2].replace('.', '').isnumeric() else elementos[i + 2]
-                    resultado = 'verdadeiro' if num1 == num2 else 'falso'
-                    elementos[i+2] = str(resultado)
-                    elementos = elementos[i+2:]
+                    op1 = elementos[i - 2]
+                    op2 = elementos[i + 2]
+                    try:
+                        # Tenta comparar como números
+                        resultado = 'verdadeiro' if float(op1) == float(op2) else 'falso'
+                    except (ValueError, TypeError):
+                        # Se falhar, compara como texto (ignorando aspas e maiúsculas/minúsculas)
+                        str1 = str(op1)[1:-1] if isinstance(op1, str) and op1.startswith('"') else str(op1)
+                        str2 = str(op2)[1:-1] if isinstance(op2, str) and op2.startswith('"') else str(op2)
+                        resultado = 'verdadeiro' if str1.lower() == str2.lower() else 'falso'
+
+                    # Substitui a sub-expressão pelo resultado
+                    del elementos[i-2:i+3]
+                    elementos.insert(i-2, resultado)
                     i = 0
 
                 elif elementos[i] == 'diferente':
@@ -157,11 +194,20 @@ class Monarca:
                         dica = f'{elementos[i-2]} é diferente\033[1;32m de\033[0m {elementos[i+1]}'
                         self.erro('O termo "de" deve ser explicitado ao usar o operador "diferente de".', dica)    
                     
-                    num1 = float(elementos[i - 2]) if elementos[i - 2].replace('.', '').isnumeric() else elementos[i - 2]
-                    num2 = float(elementos[i + 2]) if elementos[i + 2].replace('.', '').isnumeric() else elementos[i + 2]
-                    resultado = 'verdadeiro' if num1 != num2 else 'falso'
-                    elementos[i+2] = str(resultado)
-                    elementos = elementos[i+2:]
+                    op1 = elementos[i - 2]
+                    op2 = elementos[i + 2]
+                    try:
+                        # Tenta comparar como números
+                        resultado = 'verdadeiro' if float(op1) != float(op2) else 'falso'
+                    except (ValueError, TypeError):
+                        # Se falhar, compara como texto (ignorando aspas e maiúsculas/minúsculas)
+                        str1 = str(op1)[1:-1] if isinstance(op1, str) and op1.startswith('"') else str(op1)
+                        str2 = str(op2)[1:-1] if isinstance(op2, str) and op2.startswith('"') else str(op2)
+                        resultado = 'verdadeiro' if str1.lower() != str2.lower() else 'falso'
+
+                    # Substitui a sub-expressão pelo resultado
+                    del elementos[i-2:i+3]
+                    elementos.insert(i-2, resultado)
                     i = 0
 
                 elif elementos[i] == 'maior':
@@ -179,8 +225,9 @@ class Monarca:
                     num1 = float(elementos[i - 2])
                     num2 = float(elementos[i + 2])
                     resultado = 'verdadeiro' if num1 > num2 else 'falso'
-                    elementos[i+2] = str(resultado)
-                    elementos = elementos[i+2:]
+                    # Substitui a sub-expressão pelo resultado
+                    del elementos[i-2:i+3]
+                    elementos.insert(i-2, resultado)
                     i = 0
                 
                 elif elementos[i] == 'menor':
@@ -198,26 +245,42 @@ class Monarca:
                     num1 = float(elementos[i - 2])
                     num2 = float(elementos[i + 2])
                     resultado = 'verdadeiro' if num1 < num2 else 'falso'
-                    elementos[i+2] = str(resultado)
-                    elementos = elementos[i+2:]
+                    # Substitui a sub-expressão pelo resultado
+                    del elementos[i-2:i+3]
+                    elementos.insert(i-2, resultado)
                     i = 0
                 
                 else:
                     i += 1
             
             # Operadores lógicos "ou" e "e"
+            # Loop de precedência para o 'e' (AND)
             i = 0
-            while 'ou' in elementos or 'e' in elementos:
-                if elementos[i] == 'ou' or elementos[i] == 'e':
+            while 'e' in elementos:
+                if elementos[i] == 'e':
                     val1 = elementos[i - 1]
                     val2 = elementos[i + 1]
-                    # Converta para booleano Monarca
+                    # Converter para booleano Monarca
                     bool1 = (val1 == 'verdadeiro' or val1 == 'True' or val1 == '1')
                     bool2 = (val2 == 'verdadeiro' or val2 == 'True' or val2 == '1')
-                    if elementos[i] == 'ou':
-                        resultado = 'verdadeiro' if (bool1 or bool2) else 'falso'
-                    else:  # 'e'
-                        resultado = 'verdadeiro' if (bool1 and bool2) else 'falso'
+                    resultado = 'verdadeiro' if (bool1 and bool2) else 'falso'
+                    elementos[i+1] = resultado
+                    elementos.pop(i - 1)
+                    elementos.pop(i - 1)
+                    i = 0
+                else:
+                    i += 1
+            
+            # Loop para o 'ou' (OR)
+            i = 0
+            while 'ou' in elementos:
+                if elementos[i] == 'ou':
+                    val1 = elementos[i - 1]
+                    val2 = elementos[i + 1]
+                    # Converter para booleano Monarca
+                    bool1 = (val1 == 'verdadeiro' or val1 == 'True' or val1 == '1')
+                    bool2 = (val2 == 'verdadeiro' or val2 == 'True' or val2 == '1')
+                    resultado = 'verdadeiro' if (bool1 or bool2) else 'falso'
                     elementos[i+1] = resultado
                     elementos.pop(i - 1)
                     elementos.pop(i - 1)
