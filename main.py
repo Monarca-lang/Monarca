@@ -126,6 +126,23 @@ while c < len(script):
                 monarca.erro('Sintaxe do laço "para" incorreta.', dica)
             try:
                 fim = int(dlinha[3][:-1])
+                #debug contador 0 ou negativo
+                if fim <= 0:
+                    alvo = nivel_identacao
+                    temp_c = c + 1
+                    while temp_c < len(script):
+                        next_line = script[temp_c].replace('\\n', '')
+                        if next_line.strip() == '':
+                            temp_c += 1
+                            continue
+                        num_espacos_next = len(next_line) - len(next_line.lstrip())
+                        if num_espacos_next // 4 <= alvo:
+                            c = temp_c
+                            break
+                        temp_c += 1
+                    else:
+                        c = len(script) 
+                    continue 
             except ValueError:
                 monarca.erro('O valor final do laço "para" deve ser um número inteiro.')
             monarca.pilha_para.append({
