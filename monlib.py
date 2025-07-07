@@ -1,7 +1,8 @@
 class Monarca:
     def __init__(self, linha=0):
         self.linha = linha
-        self.chaveSE = [0, True] # Camada de identação / Se a camada é pra ser lida ou não(No caso por exemplo de um bloco if cuja condicional é falsa)
+        self.pilha_se = []  # Pilha if else
+        self.pilha_para = [] # Pilha for
         self.variaveis = {}
         self.palavras_reservadas = (
             'mostrar',
@@ -9,6 +10,7 @@ class Monarca:
             'deletar',
             'se',
             'senão',
+            'para'
         )
         self.operações = (
             'mais',
