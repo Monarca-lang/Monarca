@@ -15,7 +15,9 @@ variável idade recebe 30
 variável nome recebe "Monteiro"
 variável altura recebe 1,60
 variável gosta_de_paçoca? recebe Verdadeiro
+variável apelido recebe entrada: "Qual é seu apelido?"
 ```
+Perceba que a variável 'apelido' recebe uma entrada do usuário. Esse tipo de declaração/atribuição não requisita uma mensagem, porém dá essa liberdade ao usuário. A entrada do usuário é tratada da mesma maneira que os outros dados.
 
 Nomes de variáveis não podem ter espaços, embora possam conter caracteres especiais.
 ### Deletar
@@ -66,7 +68,15 @@ Os tipos primitivos de dados presentes na linguagem Monarca podem ser listados e
     5 vezes 2 é igual a 10         - verdadeiro
     8 menos 3 vezes 2 é igual a 10 - falso
     ```
-    
+
+    Também podem ser utilizados os parênteses, que fazem as operações lógicas E matemáticas serem resolvidas com prioridade.
+
+    ```pseudocode
+    5 vezes (10 dividido por 2) mais 2 é igual a 27                            - verdadeiro
+    (2 mais 2 é igual a 4 e 4 menos 2 é igual a 2) ou (4 vezes 2 é igual a 10) - verdadeiro
+    ::info isso dá verdadeiro                           e isso dá falso.
+    ::info       como é uma operação 'ou', o resultado é verdadeiro
+    ```
     
 
 
@@ -131,16 +141,16 @@ A estrutura `se` pode ser utilizada para iniciar um bloco de comandos a serem ex
 Exemplo:
 
 ```pseudocode
-se "a" é igual "b" então:
+se "a" é igual a "b" então:
     mostrar na tela: "a é igual a b"
 ```
 ## Se/Senão
-A estrutura `se/senão` diferentemente da estrutura `se`, fornece um bloco alternativo caso uma certa declaração lógica (booleana) não seja intpratada como verdadeira.
+A estrutura `se/senão` diferentemente da estrutura `se`, fornece um bloco alternativo caso uma certa declaração lógica (booleana) não seja interpretada como verdadeira.
 
 Exemplo:
 
 ```pseudocode
-se "a" é igual "b" então:
+se "a" é igual a "b" então:
     mostrar na tela: "a é igual a b"
 senão então:
     mostrar na tela: "a é diferente de b"
@@ -158,7 +168,7 @@ enquanto n é menor que 10 então:
 ```
 ## Para
 
-# Questionamentos Previstos:
+
 A estrutura `para` repete um conjunto de comandos utilizando um contador e um ponto de parada.
 
 Exemplo:
@@ -167,6 +177,9 @@ Exemplo:
 para contando até 3:
     mostrar na tela: "Esta é uma mensagem dentro de um laço!"
 ```
+
+
+# Questionamentos Previstos:
 
 * > ***Como posso comentar meu código?***
 
@@ -180,4 +193,4 @@ para contando até 3:
   ::info Saída:
   ::info Hoje eu fui no parque
   ::info e depois voltei pra casa
-
+  ```
