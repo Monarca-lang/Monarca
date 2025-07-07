@@ -23,7 +23,9 @@ except Exception:
     monarca.erro(f'Arquivo {argumentos.script} não encontrado.')
 
 # A variável c é o índice da linha, e a variável linha contém o texto da linha em si. A cada laço é interpretada uma linha do script.
-for c, linha in enumerate(script):
+c = 0
+while c < len(script):
+    linha = script[c]
     linha_original = linha.replace('\n', '') # Impede que a quebra de linha atrapalhe a leitura dos dados
     
     # Ignora comentários
@@ -113,7 +115,6 @@ for c, linha in enumerate(script):
                 valor = monarca.processar_expressao(expressao=valor)
                 cond_true = not(valor == 'falso' or (valor.isnumeric() and int(valor) == 0))
                 monarca.chaveSE = [nivel_identacao + 1, cond_true]
-                continue
     
     # Entrega um erro e uma sugestão de correção caso o comando não esteja previsto na documentação.
     else:
@@ -130,6 +131,7 @@ for c, linha in enumerate(script):
             dica = f'\033[1;32mse\033[0m [condição] então:'
         
         monarca.erro(f'Comando "{dlinha[0]}" não encontrado. Consulte a documentação.', dica)   
+    c += 1
         
 tempo_final = time()
 print(f'\n\033[1;33mTempo de execução: {tempo_final-tempo_inicial:.4f} segundos.\033[m')
