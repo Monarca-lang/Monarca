@@ -187,7 +187,7 @@ def enviar_input(event=None):
         elif input_easteregg == "sus":
             terminal_output.insert("end", "amogus\n")
             play_easter_egg("sus")
-        elif input_easteregg == "nmap -sS 127.0.0.1":
+        elif input_easteregg == "nmap -ss 127.0.0.1":
             terminal_output.insert("end", "Aqui não.\n")
         elif input_easteregg == "sudo rm -rf":
             terminal_output.insert("end", "Não vai rolar.\n")
