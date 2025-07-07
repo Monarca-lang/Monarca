@@ -8,6 +8,7 @@ import sys
 import threading
 import webbrowser
 import json
+import random
 
 # Inicialização do Pygame para áudio
 try:
@@ -69,6 +70,16 @@ root.minsize(800, 500)
 
 style = ttk.Style(root)
 style.theme_use('clam')
+def ppt(escolha):
+    numpc = random.randint(1,3)
+    numu = 1 if escolha == "pedra" else 2 if escolha == "papel" else 3
+    terminal_output.insert("end", f"O computador escolheu {'pedra' if numpc == 1 else 'papel' if numpc == 2 else 'tesoura'} \n")
+    if numpc == numu:
+        terminal_output.insert("end", "Empate!\n")
+    elif (numu == 1 and numpc == 3) or (numu == 2 and numpc == 1) or (numu == 3 and numpc == 2):
+        terminal_output.insert("end", "Você venceu!\n")
+    else:
+        terminal_output.insert("end", "Você perdeu!\n")
 
 def aplicar_tema():
     tema_cores = TEMAS[config["tema"]]
@@ -186,7 +197,6 @@ def enviar_input(event=None):
             terminal_output.insert("end", "Você é oficialmente um programador júnior agora.\n")
         elif input_easteregg == "roll d20":
             play_easter_egg("d20")
-            import random
             r = random.randint(1, 20)
             if r == 1:
                 terminal_output.insert("end", "Você tropeça e bate a cabeça no chão.\n")
@@ -231,7 +241,6 @@ def enviar_input(event=None):
             terminal_output.insert("end", "Interagir com o terminal te enche de determinação.\n")
             play_easter_egg("undertale")
         elif input_easteregg == "draven":
-            import random
             num = random.randint(1, 2)
             if num == 1:
                 terminal_output.insert("end", "Bem vindos a League of Draven!\n")
@@ -245,6 +254,12 @@ def enviar_input(event=None):
         elif input_easteregg == "zomboid" or input_easteregg == "project zomboid":
             terminal_output.insert("end", "This is how you died.\n")
             play_easter_egg("zomboid")
+        elif input_easteregg == "pedra":
+            ppt('pedra')
+        elif input_easteregg == "papel":
+            ppt('papel')
+        elif input_easteregg == "tesoura":
+            ppt('tesoura')
         elif input_easteregg in ["limpar", "cls"]:
             terminal_output.delete("1.0", "end")
         elif input_easteregg == "ajuda" or input_easteregg == "help" or input_easteregg == "comandos":
@@ -287,6 +302,7 @@ def enviar_input(event=None):
             terminal_output.insert("end", "- draven\n")
             terminal_output.insert("end", "- akali\n")
             terminal_output.insert("end", "- zomboid/project zomboid\n")
+            terminal_output.insert("end", "- pedra/papel/tesoura\n")
         else:
             terminal_output.insert("end", f"Comando '{texto_comando}' não reconhecido. Selecione um script para executar ou use 'tutorial'.\n")
         terminal_output.see("end")
