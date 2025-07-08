@@ -156,16 +156,6 @@ senão então:
     mostrar na tela: "a é diferente de b"
 ```
 # Estruturas de Repetição
-## Enquanto
-A estrutura `enquanto` repete um conjunto de comandos até que uma declaração lógica (booleana) assuma um certo valor.
-
-Exemplo:
-
-```pseudocode
-enquanto n é menor que 10 então:
-    mostrar na tela: n
-    variável n recebe n mais 1
-```
 ## Para
 
 
