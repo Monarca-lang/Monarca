@@ -9,7 +9,8 @@ import threading
 import webbrowser
 import json
 import random
-# Inicialização do Pygame para áudio
+# Inicializando o pygame para reproduzir áudios dos easter eggs
+# Se o pygame não estiver disponível, os easter eggs que dependem dele não tocarão som
 try:
     import pygame
     pygame.mixer.init()
@@ -80,6 +81,7 @@ def ppt(escolha):
     else:
         terminal_output.insert("end", "Você perdeu!\n")
 
+#função para aplicar o tema
 def aplicar_tema():
     tema_cores = TEMAS[config["tema"]]
     style.configure("My.TFrame", background=tema_cores["left_panel_bg"])
@@ -118,6 +120,7 @@ terminal_output.config(yscrollcommand=scrollbar.set)
 input_entry = tk.Entry(terminal_frame, font=("Consolas", 11))
 input_entry.pack(fill="x", side="bottom", padx=(0, 0), pady=(0, 5))
 
+# adicionei isso aqui meio em cima da hora, mas é o mínimo que um terminal deve ter né
 def navegar_historico_cima(event):
     global historico_index
     if comando_historico and historico_index > 0:
@@ -167,6 +170,8 @@ def enviar_input(event=None):
         # Se nenhum script estiver rodando, processa comandos locais/easter eggs
         terminal_output.insert("end", f"> {texto_original}\n") # Echo do comando
         input_easteregg = texto_comando.lower()
+        # nota do autor: declaro o novo rei arthur quem ter a audácia de converter essa caralhada de elif pra um dicionário bonitinho,
+        # mantendo a capacidade de tocar mídias e adicionar novos easter eggs com facilidade.
         if input_easteregg == "tutorial":
             mostrar_tutorial()
         elif input_easteregg == "arthur morgan":
@@ -211,8 +216,6 @@ def enviar_input(event=None):
             terminal_output.insert("end", "VOCÊ NÃO PRECISA DE AJUDA, VOCÊ PRECISA DE CORAGEM\n")
         elif input_easteregg == "rickroll":
             play_easter_egg("rickroll")
-        elif input_easteregg == "start game":
-            terminal_output.insert("end", "Você acorda em um terminal escuro. Uma opção pisca: 'iniciar'\n")
         elif input_easteregg == "hogwarts":
             terminal_output.insert("end", "Diretamente de Hogwarts, Wingardium Levirola\n")
             play_easter_egg("hogwarts")
@@ -225,7 +228,7 @@ def enviar_input(event=None):
         elif input_easteregg == "make me a sandwich":
             terminal_output.insert("end", "What? Make it yourself.\n")
         elif input_easteregg == "sudo make me a sandwich":
-            terminal_output.insert("end", "Okay.")
+            terminal_output.insert("end", "Okay.\n")
         elif input_easteregg == "42":
             terminal_output.insert("end", "Resposta para a Vida, o Universo e Tudo Mais.\n")
         elif input_easteregg == "big smoke":
@@ -261,6 +264,14 @@ def enviar_input(event=None):
             ppt('papel')
         elif input_easteregg == "tesoura":
             ppt('tesoura')
+        elif input_easteregg == "miles prower" or input_easteregg == "tails" or input_easteregg == "miles tails prower":
+            num = random.randint(1, 2)
+            play_easter_egg("tailsmp3")
+            play_easter_egg("tailsgif")
+            if num == 1:
+                terminal_output.insert("end", "WOOOOOW MY HEADS' SPINNING\n")
+            else:
+                terminal_output.insert("end", "Oops, I forgot something...\nThere's no landing gear in this mode...\n")
         elif input_easteregg in ["limpar", "clr", "clear"]:
             terminal_output.delete("1.0", "end")
         elif input_easteregg == "ajuda" or input_easteregg == "help" or input_easteregg == "comandos":
@@ -272,40 +283,21 @@ def enviar_input(event=None):
         elif input_easteregg == "docs":
             abrir_documentacao()
         elif input_easteregg == "totó é um mamífero":
-            terminal_output.insert("end", "lista de easter eggs:\n")
-            terminal_output.insert("end", "1 - arthur morgan\n")
-            terminal_output.insert("end", "2 - iddqd\n")
-            terminal_output.insert("end", "3 - up up down down left right left right b a\n")
-            terminal_output.insert("end", "4 - bolo/cake\n")
-            terminal_output.insert("end", "5 - fus ro dah\n")
-            terminal_output.insert("end", "6 - i need healing\n")
-            terminal_output.insert("end", "7 - minecraft\n")
-            terminal_output.insert("end", "8 - sus\n")
-            terminal_output.insert("end", "9 - nmap -sS 127.0.0.1\n")
-            terminal_output.insert("end", "10 - sudo rm -rf\n")
-            terminal_output.insert("end", "11 - telnet towel.blinkenlights.nl\n")
-            terminal_output.insert("end", "12 - hello world\n")
-            terminal_output.insert("end", "13 - roll d20\n")
-            terminal_output.insert("end", "14 - cast fireball\n")
-            terminal_output.insert("end", "15 - whoami\n")
-            terminal_output.insert("end", "16 - help me\n")
-            terminal_output.insert("end", "17 - rickroll\n")
-            terminal_output.insert("end", "18 - start game\n")
-            terminal_output.insert("end", "19 - hogwarts\n")
-            terminal_output.insert("end", "20 - this is what you asked for\n")
-            terminal_output.insert("end", "21 - cyberpunk\n")
-            terminal_output.insert("end", "22 - make me a sandwich\n")
-            terminal_output.insert("end", "23 - sudo make me a sandwich\n")
-            terminal_output.insert("end", "24 - 42\n")
-            terminal_output.insert("end", "25 - big smoke\n")
-            terminal_output.insert("end", "26 - hesoyam\n")
-            terminal_output.insert("end", "27 - shrek is love\n")
-            terminal_output.insert("end", "28 - cavalo\n")
-            terminal_output.insert("end", "29 - interagir/z/undertale\n")
-            terminal_output.insert("end", "30 - draven\n")
-            terminal_output.insert("end", "31 - akali\n")
-            terminal_output.insert("end", "32 - zomboid/project zomboid\n")
-            terminal_output.insert("end", "33 - pedra/papel/tesoura\n")
+            terminal_output.insert("end", "Lista de easter eggs:\n")
+            easter_eggs = [
+                "arthur morgan", "iddqd", "up up down down left right left right b a",
+                "bolo/cake", "fus ro dah", "i need healing", "minecraft", "sus",
+                "nmap -sS 127.0.0.1", "sudo rm -rf", "telnet towel.blinkenlights.nl",
+                "hello world", "roll d20", "cast fireball", "whoami", "help me",
+                "rickroll", "hogwarts", "this is what you asked for", "cyberpunk",
+                "make me a sandwich", "sudo make me a sandwich", "42", "big smoke",
+                "hesoyam", "shrek is love", "cavalo", "interagir/z/undertale",
+                "draven", "akali", "zomboid/project zomboid", "pedra/papel/tesoura",
+                "miles prower/tails/miles tails prower"
+            ]
+            for i, egg in enumerate(easter_eggs, 1):
+                terminal_output.insert("end", f"{i} - {egg}\n")
+
         else:
             terminal_output.insert("end", f"Comando '{texto_comando}' não reconhecido. Selecione um script para executar ou use 'tutorial'.\n")
         terminal_output.see("end")
@@ -314,8 +306,10 @@ input_entry.bind("<Return>", enviar_input)
 input_entry.bind("<Up>", navegar_historico_cima)
 input_entry.bind("<Down>", navegar_historico_baixo)
 
+    # Função recursiva para animar um GIF em um widget Label.
+    # nota do autor: admito descaradamente que pedi pro gemini fazer essa merda, mas tá funcionando aí
 def animate_gif(window, label, frames, frame_index=0):
-    """Função recursiva para animar um GIF em um widget Label."""
+
     try:
         frame = frames[frame_index]
         label.config(image=frame)
@@ -326,11 +320,9 @@ def animate_gif(window, label, frames, frame_index=0):
         # A janela foi fechada, para a animação
         pass
 
+# Função que procura por algum arquivo que tenha nome correspondente com o nome do easter egg
 def play_easter_egg(name):
-    """
-    Procura e reproduz um arquivo de mídia (áudio/imagem/gif) para um easter egg.
-    A busca é feita na pasta 'assets'.
-    """
+
     audio_exts = ['.mp3', '.wav']
     image_exts = ['.gif', '.png', '.jpg', '.jpeg']
 
@@ -360,16 +352,15 @@ def play_easter_egg(name):
 
                 img_raw = Image.open(path)
 
-                # --- Lógica de redimensionamento ---
+                # Lógica de redimensinamento pra imagem ficar proprocional a coluna esquerda. 
+                # não tá nos trinques, mas já tá ótimo
                 largura_painel = painel_esquerdo.winfo_width()
                 largura_alvo = int(largura_painel * 0.8)
                 
                 proporcao = img_raw.height / img_raw.width
                 altura_alvo = int(largura_alvo * proporcao)
-                # --- Fim da lógica de redimensionamento ---
 
                 if ext == '.gif':
-                    # Redimensiona cada frame do GIF
                     frames_resized = []
                     for frame in ImageSequence.Iterator(img_raw):
                         frame_resized = frame.copy().resize((largura_alvo, altura_alvo), Image.LANCZOS)
@@ -382,7 +373,7 @@ def play_easter_egg(name):
                     img_resized = img_raw.resize((largura_alvo, altura_alvo), Image.LANCZOS)
                     img_tk = ImageTk.PhotoImage(img_resized)
                     label = tk.Label(win, image=img_tk, borderwidth=0)
-                    label.image = img_tk  # Mantém referência para evitar garbage collection
+                    label.image = img_tk
                     label.pack()
 
                 # Centraliza a janela pop-up na janela principal
@@ -390,6 +381,7 @@ def play_easter_egg(name):
                 win.update_idletasks()
 
                 # Calcula a posição para centralizar a janela pop-up em relação à janela principal
+                # essa parte é meio gambiarra e não tá centralizando verticalmente por algum motivo
                 root_x = root.winfo_x()
                 root_y = root.winfo_y()
                 root_width = root.winfo_width()
@@ -402,10 +394,11 @@ def play_easter_egg(name):
                 pos_y = root_y + (root_height // 2) - (win_height // 2)
 
                 win.geometry(f"+{pos_x}+{pos_y}")
-                return # Para aqui se encontrar uma imagem
+                return
             except Exception as e:
                 print(f"Erro ao exibir imagem {path}: {e}")
 
+# Auto-explicativo.
 def abrir_arquivo_mc():
     path = filedialog.askopenfilename(filetypes=[("Arquivos Monarca", "*.mc")])
     if path:
@@ -421,10 +414,11 @@ def abrir_arquivo(path):
     else:
         messagebox.showerror("Erro", "Por favor, selecione um arquivo '.mc' válido.")
 
+# tava quebrando a cabeça pq o terminal usava códigos de cores ANSI e o tkinter não mostra eles do jeito que deveria,
+# então só gptei pra arrancar da saída do terminal e fé
+# quem quiser transformar o terminal emulado em um terminal real OU tentar fazer o tkinter exibir cores corretamente, só dale
 def ler_stream(stream):
-    # State machine to strip ANSI escape codes while reading char by char
-    # This avoids buffering issues with interactive input prompts
-    state = "NORMAL"  # Can be "NORMAL", "GOT_ESC", "IN_SEQ"
+    state = "NORMAL"
     while True:
         char = stream.read(1)
         if char == "" and processo.poll() is not None:
@@ -442,11 +436,10 @@ def ler_stream(stream):
             if char == '[':
                 state = "IN_SEQ"
             else:
-                state = "NORMAL" # Not a CSI sequence, consume and reset
-        elif state == "IN_SEQ":
-            if '@' <= char <= '~':  # Sequence ends with a char in this range
                 state = "NORMAL"
-            # else: still in sequence, so we consume the char by doing nothing
+        elif state == "IN_SEQ":
+            if '@' <= char <= '~':
+                state = "NORMAL"
 
 def executar_script(arquivo):
     global processo
@@ -472,6 +465,7 @@ def executar_script(arquivo):
     threading.Thread(target=ler_stream, args=(processo.stdout,), daemon=True).start()
     threading.Thread(target=ler_stream, args=(processo.stderr,), daemon=True).start()
 
+# As vezes funciona perfeitamente, as vezes funciona dando uns erros legais no topo do terminal.
 def reexecutar_script():
     if config.get("last_file") and os.path.exists(config["last_file"]):
         executar_script(config["last_file"])
@@ -515,8 +509,8 @@ info_label = tk.Label(frame_controle, text="Informações da linguagem Monarca:"
 info_label.pack(fill="x", pady=(0, 0))
 
 # Subtextos com informações adicionais
-versao_interpretador = "Versão do interpretador: bom o suficiente (turing-complete)" #+ sys.version.split()[0]
-versao_launcher = "Versão do Launcher: 4.2.0"  # Pode pegar dinamicamente se tiver como
+versao_interpretador = "Versão do interpretador: bom o suficiente (turing-complete)" 
+versao_launcher = "Versão do Launcher: 4.2.0"  
 
 label_versao_interpretador = tk.Label(frame_controle, text=versao_interpretador, font=("Segoe UI", 9), justify="left")
 label_versao_interpretador.pack(fill="x", padx=5, pady=(2, 0))
@@ -545,15 +539,16 @@ btn_parar_exec = criar_botao("Parar execução", parar_execucao)
 btn_doc = criar_botao("Abrir documentação", abrir_documentacao)
 btn_tema = criar_botao("Alternar tema", alternar_tema)
 
-# LOGO
+# Container para a coroa
 logo_container = tk.Frame(painel_esquerdo)
 logo_container.pack(side="bottom", fill="both", expand=True, pady=10)
 
-# Texto embaixo do logo
+# Label pro slogan
 logo_subtext_label = tk.Label(logo_container, text='"Eu sou mais louco que todos vocês."', font=("Segoe UI", 8, "italic"), fg="#696969")
 logo_subtext_label.pack(side="bottom", pady=(0, 10))
 
-# Debounce helper for logo resizing
+# tava com dificuldade pq quando o tamanho da janela era alterado, a logo dava um lagzinho legal quando ia se redimensionar,
+# então meti esse debounce aqui
 class Debounce:
     def __init__(self, func, wait=100):
         self.func = func
@@ -569,6 +564,7 @@ try:
     logo_path = os.path.join(BASE_DIR, "logo.png")
     logo_img_raw = Image.open(logo_path)
 
+    # Redimensiona a logo pra ficar bonitinho
     def redimensionar_logo():
         largura = painel_esquerdo.winfo_width()
         altura = int(painel_esquerdo.winfo_height() * 0.35)
@@ -585,7 +581,7 @@ try:
 
     logo_label = tk.Label(logo_container)
     logo_label.pack(expand=True)
-    # Use debounce for resize event to avoid lag
+    # Usa o debounce mencionado acima
     debounced_resize = Debounce(redimensionar_logo, wait=120)
     painel_esquerdo.bind("<Configure>", lambda e: debounced_resize())
     redimensionar_logo()
@@ -593,7 +589,7 @@ except Exception as e:
     logo_label = tk.Label(logo_container, text="[logo aqui]", fg="white", font=("Segoe UI", 18, "bold"))
     logo_label.pack(pady=5)
 
-# --- Drag and Drop Fix ---
+# fix pra fazer o DnD (não confundir com Dungeons & Dragons) funcionar
 def drag_and_drop(event):
     arquivos = root.tk.splitlist(event.data)
     if arquivos:
@@ -603,7 +599,7 @@ def drag_and_drop(event):
         else:
             messagebox.showerror("Erro", "Por favor, selecione um arquivo '.mc' válido.")
 
-# Register drag and drop on root and painel_esquerdo for best coverage
+# Garantir que o DnD funcione na janela inteira
 for widget in (root, painel_esquerdo):
     widget.drop_target_register(DND_FILES)
     widget.dnd_bind('<<Drop>>', drag_and_drop)
@@ -616,5 +612,6 @@ if len(sys.argv) > 1:
     else:
         messagebox.showerror("Erro", f"O arquivo passado não é válido: {arquivo_cli}")
 
+# cabou
 aplicar_tema()
 root.mainloop()
